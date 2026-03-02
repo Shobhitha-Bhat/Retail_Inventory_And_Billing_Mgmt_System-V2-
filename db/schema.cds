@@ -123,12 +123,3 @@ entity SalesReturnItems : cuid, managed {
 }
 
 
-// git branch -M main
-// git remote add origin https://github.com/Shobhitha-Bhat/Retail_Inventory_And_Billing_Mgmt_System-V2-.git
-// git push -u origin main
-
-
-// …or push an existing repository from the command line
-// git remote add origin https://github.com/Shobhitha-Bhat/Retail_Inventory_And_Billing_Mgmt_System-V2-.git
-// git branch -M main
-// git push -u origin mainclear
