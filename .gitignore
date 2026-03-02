@@ -1,0 +1,23 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# CAP
+gen/
+.sqlite
+*.db
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code (optional)
+.vscode/*
+!.vscode/settings.json
