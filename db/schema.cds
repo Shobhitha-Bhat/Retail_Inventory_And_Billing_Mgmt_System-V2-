@@ -1,3 +1,5 @@
+namespace my.retailshop;
+
 using {
     cuid,
     managed
@@ -9,6 +11,10 @@ entity Categories : cuid, managed {
     categoryName : String;
     catItems     : Association to many Items
                        on catItems.category = $self;
+    status : String enum {
+        ACTIVE;        
+        NO_MORE_SOLD;    
+    };
 }
 
 entity Items : cuid, managed {
@@ -16,15 +22,23 @@ entity Items : cuid, managed {
     marginPercent : Decimal(5,2);
     gstPercent    : Decimal(5,2);
     category  : Association to Categories;
-
+    status : String enum {
+        ACTIVE;
+        DISCONTINUED;
+    };
 }
 
 entity MockDistributors : cuid, managed {
     distributorName : String;
     location:String;
+    status          : String enum {
+        ACTIVE;
+        INACTIVE;
+        BLOCKED;
+    };
 }
 
-entity MockCustomer : cuid, managed {
+entity MockCustomers : cuid, managed {
     customername : String;
     city         : String;
 }
@@ -59,6 +73,11 @@ entity Inventory : cuid, managed {
     item     : Association to Items;
     quantity : Integer;
     costPrice:Decimal(10, 2);
+    criticality:Integer;
+    status:String enum{
+        LOWSTOCK;
+        AVAILABLE;
+    }
 }
 
 entity GR : cuid, managed {
@@ -84,7 +103,7 @@ entity GRItems : cuid, managed {
 
 //SALES
 entity Sales : cuid, managed {
-    customer      : Association to MockCustomer;
+    customer      : Association to MockCustomers;
     items         : Composition of many SalesItems
                         on items.parentSales = $self;
     paymentStatus : String enum {
