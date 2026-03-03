@@ -67,22 +67,10 @@ entity POItems : cuid, managed {
     itemPrice : Decimal(10,2);   
 }
 
-
-//INVENTORY
-entity Inventory : cuid, managed {
-    item     : Association to Items;
-    quantity : Integer;
-    costPrice:Decimal(10, 2);
-    criticality:Integer;
-    status:String enum{
-        LOWSTOCK;
-        AVAILABLE;
-    }
-}
-
 entity GR : cuid, managed {
     originalPO : Association to PO;
     status     : String enum {
+        Pending;
         Accepted;
         Returned;
         PartialReturn;
@@ -99,6 +87,19 @@ entity GRItems : cuid, managed {
     quantityDamaged  : Integer;
 
 }
+
+//INVENTORY
+entity Inventory : cuid, managed {
+    item     : Association to Items;
+    quantity : Integer;
+    costPrice:Decimal(10, 2);
+    criticality:Integer;
+    status:String enum{
+        LOWSTOCK;
+        AVAILABLE;
+    }
+}
+
 
 
 //SALES
@@ -136,7 +137,7 @@ entity SalesReturns : cuid, managed {
 
 entity SalesReturnItems : cuid, managed {
     parentReturn : Association to SalesReturns;
-    item         : Association to Items;
+    item         : Association to SalesItems;
     quantity     : Integer;
 
 }
