@@ -7,9 +7,10 @@ using {
 
 
 //MASTER_DATA
+@odata.draft.enabled
 entity Categories : cuid, managed {
     categoryName : String;
-    catItems     : Association to many Items
+    catItems     : Composition of many Items
                        on catItems.category = $self;
     status       : String enum {
         ACTIVE;
@@ -17,6 +18,7 @@ entity Categories : cuid, managed {
     };
 }
 
+// @odata.draft.enabled
 entity Items : cuid, managed {
     itemName      : String;
     marginPercent : Decimal(5, 2);

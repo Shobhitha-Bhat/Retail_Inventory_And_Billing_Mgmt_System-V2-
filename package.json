@@ -4,7 +4,10 @@
   "description": "Welcome to your new CAP project.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch-manage-customer": "cds watch --open managecustomer/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-manage-distributor": "cds watch --open managedistributor/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-manage-categories": "cds watch --open managecategories/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "cds": {
     "requires": {
@@ -18,7 +21,19 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@cap-js/openapi": "^1.3.1",
     "@cap-js/sqlite": "^2.1.3",
     "@sap/cds": "^9.7.1"
-  }
+  },
+  "workspaces": [
+    "app/*"
+  ],
+  "devDependencies": {
+    "cds-plugin-ui5": "^0.13.0"
+  },
+  "sapux": [
+    "app/manage-customer",
+    "app/manage-distributor",
+    "app/manage-categories"
+  ]
 }

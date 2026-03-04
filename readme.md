@@ -16,7 +16,7 @@ To add dummy data add:
 To move to sqlite sustaining app refreshes and restarts:
 ```npm add @cap-js/sqlite```
 
-To reflect the changes done to schema
+To reflect the changes done to schema.cds
 ```cds deploy --to sqlite```
 
 Fiori Applications:
