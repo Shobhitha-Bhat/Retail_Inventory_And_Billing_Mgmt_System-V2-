@@ -4,7 +4,7 @@ npm-debug.log*
 
 # CAP
 gen/
-.sqlite
+*.sqlite
 *.db
 
 # Environment
@@ -21,3 +21,5 @@ Thumbs.db
 # VS Code (optional)
 .vscode/*
 !.vscode/settings.json
+
+*.csv

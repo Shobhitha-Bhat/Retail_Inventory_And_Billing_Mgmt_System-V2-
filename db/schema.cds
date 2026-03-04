@@ -48,7 +48,7 @@ entity PO : cuid, managed {
     status   : String enum {
         Open;
         Closed;
-        Partial;
+        Partial;        
     }
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
