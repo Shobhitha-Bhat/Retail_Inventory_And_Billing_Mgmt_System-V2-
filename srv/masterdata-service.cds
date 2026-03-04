@@ -12,12 +12,11 @@ service MasterDataService{
         action discontinueItems() returns Items;
     }
 
-
+    //just viewing the customers
     entity Customers as projection on db.MockCustomers;
 
     entity Distributors as projection on db.MockDistributors
     actions{
         action inActivateDistributor() returns Distributors;
-        action blockDistributor() returns Distributors;
     }
 }

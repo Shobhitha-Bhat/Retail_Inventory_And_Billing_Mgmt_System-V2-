@@ -34,7 +34,6 @@ entity MockDistributors : cuid, managed {
     status          : String enum {
         ACTIVE;
         INACTIVE;
-        BLOCKED;
     };
 }
 
@@ -54,6 +53,7 @@ entity PO : cuid, managed {
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
     supplier : Association to MockDistributors;
+    totalAmount:Decimal(10,2); //calculated from poitems
 }
 
 entity POItems : cuid, managed {
@@ -70,21 +70,33 @@ entity POItems : cuid, managed {
 entity GR : cuid, managed {
     originalPO : Association to PO;
     status     : String enum {
-        Pending;
+        StockRcvd_InspectionInProgress;
         Accepted;
         Returned;
         PartialReturn;
     }
     grItems    : Composition of many GRItems
                      on grItems.parentGR = $self;
+    paymentStatus : String enum {
+        Pending;
+        PartiallyPaid;
+        Paid;
+    };
+    totalAmount  : Decimal(15,2);   // actual payable amount
+    amountPaid   : Decimal(15,2);
 
 }
 
 entity GRItems : cuid, managed {
     parentGR         : Association to GR;
+    poItem           : Association to POItems;
     items            : Association to Items;
     quantityReceived : Integer;
     quantityDamaged  : Integer;
+    inspectionStatus : String enum {
+        Pending;
+        Inspected;
+    };
 
 }
 
