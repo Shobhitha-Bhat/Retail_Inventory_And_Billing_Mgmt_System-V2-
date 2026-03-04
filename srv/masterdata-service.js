@@ -1,5 +1,7 @@
 module.exports = function () {
 
+    //instead of disabling or hiding delete button, a custom msg is shown when btn clicked
+    
     this.before('DELETE', 'Distributors', (req) => {
         req.reject(400, 'Distributor cannot be deleted. Use Inactivate action.');
     });
