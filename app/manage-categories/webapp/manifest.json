@@ -49,7 +49,8 @@
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
-        "sap.fe.templates": {}
+        "sap.fe.templates": {},
+        "sap.f": {}
       }
     },
     "contentDensities": {
@@ -81,22 +82,37 @@
       "css": []
     },
     "routing": {
-      "config": {},
+      "config": {
+        "flexibleColumnLayout": {
+          "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
+          "defaultThreeColumnLayoutType": "ThreeColumnsEndExpanded"
+        },
+        "routerClass": "sap.f.routing.Router"
+      },
       "routes": [
         {
           "pattern": ":?query:",
           "name": "CategoriesList",
-          "target": "CategoriesList"
+          "target": [
+            "CategoriesList"
+          ]
         },
         {
           "pattern": "Categories({key}):?query:",
           "name": "CategoriesObjectPage",
-          "target": "CategoriesObjectPage"
+          "target": [
+            "CategoriesList",
+            "CategoriesObjectPage"
+          ]
         },
         {
           "pattern": "Categories({key})/catItems({key2}):?query:",
           "name": "ItemsObjectPage",
-          "target": "ItemsObjectPage"
+          "target": [
+            "CategoriesList",
+            "CategoriesObjectPage",
+            "ItemsObjectPage"
+          ]
         }
       ],
       "targets": {
@@ -124,7 +140,9 @@
               },
               "initialLoad": "Enabled"
             }
-          }
+          },
+          "controlAggregation": "beginColumnPages",
+          "contextPattern": ""
         },
         "CategoriesObjectPage": {
           "type": "Component",
@@ -143,7 +161,9 @@
               },
               "sectionLayout": "Page"
             }
-          }
+          },
+          "controlAggregation": "midColumnPages",
+          "contextPattern": "/Categories({key})"
         },
         "ItemsObjectPage": {
           "type": "Component",
@@ -154,9 +174,17 @@
               "editableHeaderContent": false,
               "contextPath": "/Categories/catItems"
             }
-          }
+          },
+          "controlAggregation": "endColumnPages",
+          "contextPattern": "/Categories({key})/catItems({key2})"
         }
       }
+    },
+    "rootView": {
+      "viewName": "sap.fe.templates.RootContainer.view.Fcl",
+      "type": "XML",
+      "async": true,
+      "id": "appRootView"
     }
   },
   "sap.fiori": {

@@ -23,7 +23,7 @@ entity Items : cuid, managed {
     itemName      : String;
     marginPercent : Decimal(5, 2);
     gstPercent    : Decimal(5, 2);
-    category      : Association to Categories;
+    category      : Association to Categories ;
     status        : String enum {
         ACTIVE;
         DISCONTINUED;
@@ -37,6 +37,7 @@ entity MockDistributors : cuid, managed {
         ACTIVE;
         INACTIVE;
     };
+    receievedPOs: Association to many PO on receievedPOs.supplier=$self;
 }
 
 entity MockCustomers : cuid, managed {
@@ -60,7 +61,7 @@ entity PO : cuid, managed {
 
 entity POItems : cuid, managed {
     parentPO   : Association to PO;
-    items      : Association to Items;
+    poItem      : Association to Items;
     quantity   : Integer;
 
     //Based on Mutual Agreement with the Distributor.
@@ -92,7 +93,7 @@ entity GR : cuid, managed {
 entity GRItems : cuid, managed {
     parentGR         : Association to GR;
     poItem           : Association to POItems;
-    items            : Association to Items;
+    // items            : Association to Items;
     quantityReceived : Integer;
     quantityDamaged  : Integer;
     inspectionStatus : String enum {
@@ -104,7 +105,8 @@ entity GRItems : cuid, managed {
 
 //INVENTORY
 entity Inventory : cuid, managed {
-    item        : Association to Items;
+    inventoryItem        : Association to Items;
+    // inventoryItem: Association to POItems;
     quantity    : Integer;
     costPrice   : Decimal(10, 2);
     criticality : Integer;
@@ -116,10 +118,12 @@ entity Inventory : cuid, managed {
 
 
 //SALES
+@odata.draft.enabled
 entity Sales : cuid, managed {
     customer      : Association to MockCustomers;
     items         : Composition of many SalesItems
                         on items.parentSales = $self;
+     @Common.ValueListWithFixedValues
     paymentStatus : String enum {
         Pending;
         Paid;
@@ -142,6 +146,7 @@ entity SalesItems : cuid, managed {
     totalAmount   : Decimal(12, 2);
 }
 
+@odata.draft.enabled
 entity SalesReturns : cuid, managed {
     originalSales : Association to Sales;
     returnItems   : Composition of many SalesReturnItems
@@ -167,6 +172,7 @@ entity RetailLedger : cuid, managed {
         PROCUREMENT;
         SALES;
         MISC;
+        INVESTMENT; 
     };
     amount       : Decimal(15, 2);
     totalBalance : Decimal(15, 2); // Running balance 

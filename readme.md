@@ -22,7 +22,7 @@ To reflect the changes done to schema.cds
 Fiori Applications:
 - manage-customers
 - manage-distributors
-- manage-items
+- manage-items   X
 - manage-categories
 - manage-purchaseorders
 - manage-goodsreceipts

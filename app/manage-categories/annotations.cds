@@ -67,6 +67,11 @@ annotate service.Items with @(
         Data : [
             {
                 $Type : 'UI.DataField',
+                Value : ID,
+                Label : 'ID',
+            },
+            {
+                $Type : 'UI.DataField',
                 Value : itemName,
                 Label : 'itemName',
             },
