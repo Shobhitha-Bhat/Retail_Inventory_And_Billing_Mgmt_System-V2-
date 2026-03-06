@@ -12,10 +12,16 @@ entity Categories : cuid, managed {
     categoryName : String;
     catItems     : Composition of many Items
                        on catItems.category = $self;
-    status       : String enum {
-        ACTIVE;
-        NO_MORE_SOLD;
-    };
+    // status       : String enum {
+    //     ACTIVE;
+    //     NO_MORE_SOLD;
+    // };
+    status:Association to CategoryStatus;
+}
+
+entity CategoryStatus:cuid{
+    catStatus:String;
+
 }
 
 // @odata.draft.enabled
@@ -24,20 +30,33 @@ entity Items : cuid, managed {
     marginPercent : Decimal(5, 2);
     gstPercent    : Decimal(5, 2);
     category      : Association to Categories ;
-    status        : String enum {
-        ACTIVE;
-        DISCONTINUED;
-    };
+    // status        : String enum {
+    //     ACTIVE;
+    //     DISCONTINUED;
+    // };
+    status:Association to ItemStatus;
+
 }
 
+entity ItemStatus:cuid{
+    itStatus:String;
+}
+
+@odata.draft.enabled
 entity MockDistributors : cuid, managed {
     distributorName : String;
     location        : String;
-    status          : String enum {
-        ACTIVE;
-        INACTIVE;
-    };
+    // status          : String enum {
+    //     ACTIVE;
+    //     INACTIVE;
+    // };
+    status:Association to DistributorStatus;
     receievedPOs: Association to many PO on receievedPOs.supplier=$self;
+}
+
+
+entity DistributorStatus:cuid{
+    distriStatus:String;
 }
 
 entity MockCustomers : cuid, managed {
@@ -47,17 +66,25 @@ entity MockCustomers : cuid, managed {
 
 
 //PROCUREMENT
+
 entity PO : cuid, managed {
-    status   : String enum {
-        Open;
-        Closed;
-        Partial;        
-    }
+    // status   : String enum {
+    //     Open;
+    //     Closed;
+    //     Partial;        
+    // }
+    status:Association to POStatus;
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
     supplier : Association to MockDistributors;
     totalAmount:Decimal(10,2); //calculated from poitems
 }
+
+
+entity POStatus:cuid{
+    poStatus:String;
+}
+
 
 entity POItems : cuid, managed {
     parentPO   : Association to PO;
@@ -72,22 +99,31 @@ entity POItems : cuid, managed {
 
 entity GR : cuid, managed {
     originalPO : Association to PO;
-    status     : String enum {
-        StockRcvd_InspectionInProgress;
-        Accepted;
-        Returned;
-        PartialReturn;
-    }
+    // status     : String enum {
+    //     StockRcvd_InspectionInProgress;
+    //     Accepted;
+    //     Returned;
+    //     PartialReturn;
+    // }
+    status:Association to GRStatus;
     grItems    : Composition of many GRItems
                      on grItems.parentGR = $self;
-    paymentStatus : String enum {
-        Pending;
-        PartiallyPaid;
-        Paid;
-    };
+    // paymentStatus : String enum {
+    //     Pending;
+    //     PartiallyPaid;
+    //     Paid;
+    // };
+    paymentStatus:Association to GRPaymentStatus;
     totalAmount  : Decimal(15,2);   // actual payable amount
     amountPaid   : Decimal(15,2);
+}
 
+entity GRPaymentStatus:cuid{
+    grPayStatus:String;
+}
+
+entity GRStatus:cuid{
+    grStatus:String;
 }
 
 entity GRItems : cuid, managed {
@@ -96,11 +132,15 @@ entity GRItems : cuid, managed {
     // items            : Association to Items;
     quantityReceived : Integer;
     quantityDamaged  : Integer;
-    inspectionStatus : String enum {
-        Pending;
-        Inspected;
-    };
+    // inspectionStatus : String enum {
+    //     Pending;
+    //     Inspected;
+    // };
+    inspectionStatus:Association to GRItemInspectStatus;
+}
 
+entity GRItemInspectStatus:cuid{
+    inspectStatus:String;
 }
 
 //INVENTORY
@@ -110,10 +150,15 @@ entity Inventory : cuid, managed {
     quantity    : Integer;
     costPrice   : Decimal(10, 2);
     criticality : Integer;
-    status      : String enum {
-        LOWSTOCK;
-        AVAILABLE;
-    }
+    // status      : String enum {
+    //     LOWSTOCK;
+    //     AVAILABLE;
+    // }
+    status:Association to InventoryStatus;
+}
+
+entity InventoryStatus:cuid{
+    invStatus:String;
 }
 
 
@@ -123,17 +168,30 @@ entity Sales : cuid, managed {
     customer      : Association to MockCustomers;
     items         : Composition of many SalesItems
                         on items.parentSales = $self;
-     @Common.ValueListWithFixedValues
-    paymentStatus : String enum {
-        Pending;
-        Paid;
-    }
-    returnStatus  : String enum {
-        None;
-        Partial;
-        CompleteReturn;
-    }
+    // paymentStatus : String enum {
+    //     Pending;
+    //     Paid;
+    // }
+    // returnStatus  : String enum {
+    //     None;
+    //     Partial;
+    //     CompleteReturn;
+    // }
+    paymentStatus:Association to SalesPayStatus;
+    returnStatus:Association to SalesReturnStatus;
 }
+
+
+entity SalesPayStatus:cuid{
+    payStatus:String;
+}
+
+entity SalesReturnStatus:cuid{
+    retStatus:String;
+}
+
+
+
 
 entity SalesItems : cuid, managed {
     parentSales   : Association to Sales;
@@ -164,16 +222,27 @@ entity SalesReturnItems : cuid, managed {
 //FINANCE
 
 entity RetailLedger : cuid, managed {
-    entryType    : String enum {
-        CREDIT; 
-        DEBIT; 
-    };
-    department   : String enum {
-        PROCUREMENT;
-        SALES;
-        MISC;
-        INVESTMENT; 
-    };
+    // entryType    : String enum {
+    //     CREDIT; 
+    //     DEBIT; 
+    // };
+    // department   : String enum {
+    //     PROCUREMENT;
+    //     SALES;
+    //     MISC;
+    //     INVESTMENT; 
+    // };
+    entryType:Association to PassbookEntryTypes;
+    department:Association to Departments;
     amount       : Decimal(15, 2);
     totalBalance : Decimal(15, 2); // Running balance 
 }
+
+entity PassbookEntryTypes:cuid{
+    entryType:String;
+}
+
+entity Departments:cuid{
+    dept:String;
+}
+

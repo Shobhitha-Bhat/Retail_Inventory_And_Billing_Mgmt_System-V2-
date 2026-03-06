@@ -5,13 +5,18 @@ annotate service.PO with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'status',
-                Value : status,
+                Label : 'totalAmount',
+                Value : totalAmount,
+            },
+            {
+                $Type : 'UI.DataFieldForAction',
+                Action : 'ProcurementService.approvePO',
+                Label : 'approvePO',
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'totalAmount',
-                Value : totalAmount,
+                Value : status_ID,
+                Label : 'status_ID',
             },
         ],
     },
@@ -34,11 +39,6 @@ annotate service.PO with @(
             $Type : 'UI.DataField',
             Value : ID,
             Label : 'ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'status',
-            Value : status,
         },
         {
             $Type : 'UI.DataField',
@@ -72,16 +72,6 @@ annotate service.POItems with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : items_ID,
-            Label : 'items_ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : items.itemName,
-            Label : 'itemName',
-        },
-        {
-            $Type : 'UI.DataField',
             Value : itemPrice,
             Label : 'itemPrice',
         },
@@ -95,13 +85,23 @@ annotate service.POItems with @(
             Value : openQty,
             Label : 'openQty',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : poItem_ID,
+            Label : 'poItem_ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : poItem.itemName,
+            Label : 'itemName',
+        },
     ],
     UI.Facets : [
         {
             $Type : 'UI.ReferenceFacet',
             Label : 'Item Information',
             ID : 'ItemInformation',
-            Target : '@UI.FieldGroup#ItemInformation',
+            Target : '@UI.FieldGroup#ItemInformation1',
         },
     ],
     UI.FieldGroup #ItemInformation : {
@@ -134,5 +134,48 @@ annotate service.POItems with @(
             },
         ],
     },
+    UI.FieldGroup #ItemInformation1 : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : ID,
+                Label : 'ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : poItem.itemName,
+                Label : 'itemName',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : poItem.marginPercent,
+                Label : 'marginPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : poItem.gstPercent,
+                Label : 'gstPercent',
+            },
+        ],
+    },
 );
+
+annotate service.PO with {
+    status @(
+        Common.ExternalID : status.poStatus,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'POStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : status_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'POStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
 

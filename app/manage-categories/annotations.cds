@@ -10,8 +10,8 @@ annotate service.Categories with @(
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'status',
-                Value : status,
+                Value : status_ID,
+                Label : 'status_ID',
             },
         ],
     },
@@ -37,11 +37,6 @@ annotate service.Categories with @(
         },
         {
             $Type : 'UI.DataField',
-            Label : 'status',
-            Value : status,
-        },
-        {
-            $Type : 'UI.DataField',
             Value : catItems.itemName,
             Label : 'itemName',
         },
@@ -49,6 +44,11 @@ annotate service.Categories with @(
             $Type : 'UI.DataFieldForAction',
             Action : 'MasterDataService.discontinueCategory',
             Label : 'discontinueCategory',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : status.catStatus,
+            Label : 'catStatus',
         },
     ],
 );
@@ -85,6 +85,11 @@ annotate service.Items with @(
                 Value : gstPercent,
                 Label : 'gstPercent',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : status_ID,
+                Label : 'status_ID',
+            },
         ],
     },
     UI.LineItem #ItemsInCategory : [
@@ -110,4 +115,44 @@ annotate service.Items with @(
         },
     ],
 );
+
+annotate service.Categories with {
+    status @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'CategoryStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : status_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'CategoryStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+        Common.ExternalID : status.catStatus,
+)};
+
+annotate service.CategoryStatus with {
+    ID @Common.Text : catStatus
+};
+
+annotate service.Items with {
+    status @(
+        Common.ExternalID : status.itStatus,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'ItemStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : status_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'ItemStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
 

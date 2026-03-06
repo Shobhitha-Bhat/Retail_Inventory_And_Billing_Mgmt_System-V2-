@@ -8,6 +8,10 @@ service SalesService{
         action generateInvoice() returns LargeBinary;
     }
 
+    entity SalesPayStatus as projection on db.SalesPayStatus;
+    entity SalesReturnStatus as projection on db.SalesReturnStatus;
+    entity MockCustomers as projection on db.MockCustomers;
+    
     entity SalesItems as projection on db.SalesItems
     actions{
         action removeItemsFromShopping(quantity:Integer) returns SalesItems;    //before paying for a purchase

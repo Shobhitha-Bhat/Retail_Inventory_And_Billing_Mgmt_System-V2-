@@ -21,6 +21,9 @@
       "db": {
         "kind": "sqlite"
       }
+    },
+    "log":{
+      "level":"error"
     }
   },
   "keywords": [],

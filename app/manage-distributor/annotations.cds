@@ -15,8 +15,8 @@ annotate service.Distributors with @(
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'status',
-                Value : status,
+                Value : status_ID,
+                Label : 'status_ID',
             },
         ],
     },
@@ -40,15 +40,33 @@ annotate service.Distributors with @(
             Value : location,
         },
         {
-            $Type : 'UI.DataField',
-            Label : 'status',
-            Value : status,
-        },
-        {
             $Type : 'UI.DataFieldForAction',
             Action : 'MasterDataService.inActivateDistributor',
             Label : 'inActivateDistributor',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : status.distriStatus,
+            Label : 'distriStatus',
+        },
     ],
 );
+
+annotate service.Distributors with {
+    status @(
+        Common.ExternalID : status.distriStatus,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'DistributorStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : status_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'DistributorStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
 

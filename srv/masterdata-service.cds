@@ -6,12 +6,14 @@ service MasterDataService{
         action discontinueCategory() returns Categories;
     }
 
+    entity CategoryStatus as projection on db.CategoryStatus;
 
     entity Items as projection on db.Items
     actions{
         action discontinueItems() returns Items;
     }
 
+entity ItemStatus as projection on db.ItemStatus;
     //just viewing the customers
     entity Customers as projection on db.MockCustomers;
 
@@ -19,4 +21,5 @@ service MasterDataService{
     actions{
         action inActivateDistributor() returns Distributors;
     }
+    entity DistributorStatus as projection on db.DistributorStatus;
 }

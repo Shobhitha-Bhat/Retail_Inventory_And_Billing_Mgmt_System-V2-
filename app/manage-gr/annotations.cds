@@ -5,16 +5,6 @@ annotate service.GR with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'status',
-                Value : status,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'paymentStatus',
-                Value : paymentStatus,
-            },
-            {
-                $Type : 'UI.DataField',
                 Label : 'totalAmount',
                 Value : totalAmount,
             },
@@ -22,6 +12,11 @@ annotate service.GR with @(
                 $Type : 'UI.DataField',
                 Label : 'amountPaid',
                 Value : amountPaid,
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : status.grStatus,
+                Label : 'grStatus',
             },
         ],
     },
@@ -47,21 +42,6 @@ annotate service.GR with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : originalPO_ID,
-            Label : 'originalPO_ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'status',
-            Value : status,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'paymentStatus',
-            Value : paymentStatus,
-        },
-        {
-            $Type : 'UI.DataField',
             Label : 'totalAmount',
             Value : totalAmount,
         },
@@ -75,30 +55,23 @@ annotate service.GR with @(
             Action : 'ProcurementService.approveGR',
             Label : 'approveGR',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : originalPO_ID,
+            Label : 'originalPO_ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : status.grStatus,
+            Label : 'grStatus',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : paymentStatus.grPayStatus,
+            Label : 'grPayStatus',
+        },
     ],
 );
-
-annotate service.GR with {
-    originalPO @Common.ValueList : {
-        $Type : 'Common.ValueListType',
-        CollectionPath : 'PO',
-        Parameters : [
-            {
-                $Type : 'Common.ValueListParameterInOut',
-                LocalDataProperty : originalPO_ID,
-                ValueListProperty : 'ID',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'status',
-            },
-            {
-                $Type : 'Common.ValueListParameterDisplayOnly',
-                ValueListProperty : 'totalAmount',
-            },
-        ],
-    }
-};
 
 annotate service.GRItems with @(
     UI.LineItem #GRItems : [
@@ -134,8 +107,8 @@ annotate service.GRItems with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : inspectionStatus,
-            Label : 'inspectionStatus',
+            Value : inspectionStatus.inspectStatus,
+            Label : 'inspectStatus',
         },
     ],
     UI.Facets : [

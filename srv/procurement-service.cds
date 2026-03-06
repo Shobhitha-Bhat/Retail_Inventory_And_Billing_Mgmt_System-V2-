@@ -5,6 +5,7 @@ service ProcurementService{
     actions{
         action approvePO(); 
     }
+    entity POStatus as projection on db.POStatus;
 
     entity POItems as projection on db.POItems{
        *,
@@ -25,8 +26,12 @@ service ProcurementService{
     actions{
         action approveGR() returns GR;
     }
+    entity GRStatus as projection on db.GRStatus;
     entity GRItems as projection on db.GRItems
     actions{
         action markInspected(quantityDamaged:Integer) returns GRItems;
     }
+
+    entity GRItemInspectStatus as projection on db.GRItemInspectStatus;
+    entity GRPaymentStatus as projection on db.GRPaymentStatus;
 }

@@ -82,13 +82,7 @@
       "css": []
     },
     "routing": {
-      "config": {
-        "flexibleColumnLayout": {
-          "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
-          "defaultThreeColumnLayoutType": "ThreeColumnsMidExpanded"
-        },
-        "routerClass": "sap.f.routing.Router"
-      },
+      "config": {},
       "routes": [
         {
           "pattern": ":?query:",
@@ -140,9 +134,7 @@
               },
               "initialLoad": "Enabled"
             }
-          },
-          "controlAggregation": "beginColumnPages",
-          "contextPattern": ""
+          }
         },
         "POObjectPage": {
           "type": "Component",
@@ -160,9 +152,7 @@
                 }
               }
             }
-          },
-          "controlAggregation": "midColumnPages",
-          "contextPattern": "/PO({key})"
+          }
         },
         "POItemsObjectPage": {
           "type": "Component",
@@ -173,17 +163,9 @@
               "editableHeaderContent": false,
               "contextPath": "/PO/poItems"
             }
-          },
-          "controlAggregation": "endColumnPages",
-          "contextPattern": "/PO({key})/poItems({key2})"
+          }
         }
       }
-    },
-    "rootView": {
-      "viewName": "sap.fe.templates.RootContainer.view.Fcl",
-      "type": "XML",
-      "async": true,
-      "id": "appRootView"
     }
   },
   "sap.fiori": {

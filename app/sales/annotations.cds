@@ -7,13 +7,23 @@ annotate service.Sales with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'paymentStatus',
-                Value : paymentStatus,
+                Value : paymentStatus_ID,
+                Label : 'paymentStatus_ID',
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'returnStatus',
-                Value : returnStatus,
+                Value : returnStatus_ID,
+                Label : 'returnStatus_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : ID,
+                Label : 'ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : customer_ID,
+                Label : 'customer_ID',
             },
         ],
     },
@@ -32,16 +42,6 @@ annotate service.Sales with @(
         },
     ],
     UI.LineItem : [
-        {
-            $Type : 'UI.DataField',
-            Label : 'paymentStatus',
-            Value : paymentStatus,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'returnStatus',
-            Value : returnStatus,
-        },
         {
             $Type : 'UI.DataFieldForAction',
             Action : 'SalesService.generateInvoice',
@@ -66,6 +66,16 @@ annotate service.Sales with @(
             $Type : 'UI.DataField',
             Value : customer_ID,
             Label : 'customer_ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : paymentStatus.payStatus,
+            Label : 'payStatus',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : returnStatus.retStatus,
+            Label : 'retStatus',
         },
     ],
     UI.SelectionPresentationVariant #tableView : {
@@ -224,4 +234,44 @@ annotate service.Sales with {
         },
         Common.ValueListWithFixedValues : true,
 )};
+
+annotate service.Sales with {
+    returnStatus @(
+        Common.ExternalID : returnStatus.retStatus,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'SalesReturnStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : returnStatus_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'ReturnStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
+
+annotate service.Sales with {
+    customer @(
+        Common.ExternalID : customer.customername,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'MockCustomers',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : customer_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'Customers',
+        },
+        Common.ValueListWithFixedValues : false,
+)};
+
+annotate service.MockCustomers with {
+    customername @Common.Text : city
+};
 
