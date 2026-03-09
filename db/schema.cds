@@ -59,6 +59,8 @@ entity DistributorStatus:cuid{
     distriStatus:String;
 }
 
+
+@odata.draft.enabled
 entity MockCustomers : cuid, managed {
     customername : String;
     city         : String;

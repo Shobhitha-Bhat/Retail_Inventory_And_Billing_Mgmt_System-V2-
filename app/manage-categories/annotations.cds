@@ -36,11 +36,6 @@ annotate service.Categories with @(
             Value : categoryName,
         },
         {
-            $Type : 'UI.DataField',
-            Value : catItems.itemName,
-            Label : 'itemName',
-        },
-        {
             $Type : 'UI.DataFieldForAction',
             Action : 'MasterDataService.discontinueCategory',
             Label : 'discontinueCategory',

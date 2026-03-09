@@ -283,7 +283,7 @@ annotate service.SalesItems with {
         },
         Common.ValueListWithFixedValues : true,
         Common.ExternalID : item.itemName,
-)};
+        )};
 
 annotate service.Items with {
     ID @(
