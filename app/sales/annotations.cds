@@ -7,16 +7,6 @@ annotate service.Sales with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Value : paymentStatus_ID,
-                Label : 'paymentStatus_ID',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : returnStatus_ID,
-                Label : 'returnStatus_ID',
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : ID,
                 Label : 'ID',
             },
@@ -24,6 +14,26 @@ annotate service.Sales with @(
                 $Type : 'UI.DataField',
                 Value : customer_ID,
                 Label : 'customer_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : returnStatus_ID,
+                Label : 'returnStatus',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : paymentStatus_ID,
+                Label : 'paymentStatus_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : customer.contactNumber,
+                Label : 'contactNumber',
+            },
+            {
+                $Type : 'UI.DataFieldForAction',
+                Action : 'SalesService.addnewCustomer',
+                Label : 'addnewCustomer',
             },
         ],
     },
@@ -69,8 +79,13 @@ annotate service.Sales with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : paymentStatus.payStatus,
-            Label : 'payStatus',
+            Value : customer.customername,
+            Label : 'customername',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : customer.city,
+            Label : 'city',
         },
         {
             $Type : 'UI.DataField',
@@ -105,12 +120,7 @@ annotate service.SalesItems with @(
         {
             $Type : 'UI.DataField',
             Value : item_ID,
-            Label : 'item_ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : item.itemName,
-            Label : 'itemName',
+            Label : 'item',
         },
         {
             $Type : 'UI.DataField',
@@ -218,22 +228,6 @@ annotate service.SalesReturnItems with @(
     ]
 );
 
-annotate service.Sales with {
-    paymentStatus @(
-        Common.ValueList : {
-            $Type : 'Common.ValueListType',
-            CollectionPath : 'Sales',
-            Parameters : [
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty : paymentStatus,
-                    ValueListProperty : 'paymentStatus',
-                },
-            ],
-            Label : 'Status',
-        },
-        Common.ValueListWithFixedValues : true,
-)};
 
 annotate service.Sales with {
     returnStatus @(
@@ -255,7 +249,6 @@ annotate service.Sales with {
 
 annotate service.Sales with {
     customer @(
-        Common.ExternalID : customer.customername,
         Common.ValueList : {
             $Type : 'Common.ValueListType',
             CollectionPath : 'MockCustomers',
@@ -268,10 +261,90 @@ annotate service.Sales with {
             ],
             Label : 'Customers',
         },
-        Common.ValueListWithFixedValues : false,
+        Common.ValueListWithFixedValues : true,
+        Common.ExternalID : customer.customername,
 )};
 
+
+
+annotate service.SalesItems with {
+    item @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Items',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : item_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'Item',
+        },
+        Common.ValueListWithFixedValues : true,
+        Common.ExternalID : item.itemName,
+)};
+
+annotate service.Items with {
+    ID @(
+        Common.Text : itemName,
+        Common.Text.@UI.TextArrangement : #TextLast,
+)};
+
+
+
+annotate service.Sales with {
+    paymentStatus @(
+        Common.ExternalID : paymentStatus.payStatus,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'SalesPayStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : paymentStatus_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'Paymentstatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
+
+
 annotate service.MockCustomers with {
-    customername @Common.Text : city
-};
+    customername @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'MockCustomers',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : customername,
+                    ValueListProperty : 'customername',
+                },
+            ],
+            Label : 'customer name',
+        },
+        Common.ValueListWithFixedValues : true,
+        Common.Text : contactNumber,
+        Common.Text.@UI.TextArrangement : #TextLast,
+)};
+
+annotate service.Items with {
+    itemName @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Items',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : itemName,
+                    ValueListProperty : 'itemName',
+                },
+            ],
+            Label : 'Itemname',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
 

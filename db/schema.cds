@@ -62,6 +62,7 @@ entity DistributorStatus:cuid{
 entity MockCustomers : cuid, managed {
     customername : String;
     city         : String;
+    contactNumber:String(20)  @UI.CreateHidden;
 }
 
 

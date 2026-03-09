@@ -36,16 +36,6 @@ annotate service.RetailLedger with @(
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
-            Label : 'department',
-            Value : department,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'entryType',
-            Value : entryType,
-        },
-        {
-            $Type : 'UI.DataField',
             Label : 'amount',
             Value : amount,
         },
@@ -54,6 +44,24 @@ annotate service.RetailLedger with @(
             Label : 'totalBalance',
             Value : totalBalance,
         },
+        {
+            $Type : 'UI.DataField',
+            Value : department_ID,
+            Label : 'department',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : entryType_ID,
+            Label : 'entryType',
+        },
     ],
 );
+
+annotate service.RetailLedger with {
+    department @Common.ExternalID : department.dept
+};
+
+annotate service.RetailLedger with {
+    entryType @Common.ExternalID : entryType.entryType
+};
 

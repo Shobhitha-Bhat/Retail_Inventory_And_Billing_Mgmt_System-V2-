@@ -6,11 +6,13 @@ service SalesService{
         action payForPurchase() returns Sales;
         action returnEntirePurchase() returns Sales;
         action generateInvoice() returns LargeBinary;
+        action addnewCustomer(customername:String,city:String,contactNumber:String(20));
     }
 
     entity SalesPayStatus as projection on db.SalesPayStatus;
     entity SalesReturnStatus as projection on db.SalesReturnStatus;
     entity MockCustomers as projection on db.MockCustomers;
+    entity Items as projection on db.Items;
     
     entity SalesItems as projection on db.SalesItems
     actions{
