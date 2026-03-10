@@ -1,0 +1,3 @@
+ID,createdAt,createdBy,modifiedAt,modifiedBy,distributorName,location,status_ID
+dd7fd901-d2a5-4ae5-810f-f2800e39f86c,2026-03-09T10:02:05.279Z,anonymous,2026-03-09T10:02:05.279Z,anonymous,Distributor1,Mnglr,90c159fc-a231-4793-a87a-22e5289bd55b
+d64e2590-6f3e-4a93-aa6d-cb477329d32f,2026-03-09T10:02:28.695Z,anonymous,2026-03-09T10:02:28.695Z,anonymous,Distributor2,Mnglr,90c159fc-a231-4793-a87a-22e5289bd55b

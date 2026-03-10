@@ -4,6 +4,7 @@ service MasterDataService{
     entity Categories as projection on db.Categories
     actions{
         action discontinueCategory() returns Categories;
+        action continueCategory() returns Categories;
     }
 
     entity CategoryStatus as projection on db.CategoryStatus;
@@ -11,6 +12,7 @@ service MasterDataService{
     entity Items as projection on db.Items
     actions{
         action discontinueItems() returns Items;
+        action continueItems() returns Items;
     }
 
 entity ItemStatus as projection on db.ItemStatus;

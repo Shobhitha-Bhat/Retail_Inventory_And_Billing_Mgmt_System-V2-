@@ -1,0 +1,5 @@
+ID,createdAt,createdBy,modifiedAt,modifiedBy,itemName,marginPercent,gstPercent,category_ID,status_ID
+37ca2619-d84e-4fae-b019-7461a20ec83d,2026-03-09T09:50:47.889Z,anonymous,2026-03-09T09:51:12.149Z,anonymous,EastMan,10,12,1d11da06-2e67-4aa1-8842-d9bbd3b60113,7181a2e0-ba47-478a-adf2-6c49f8e8720d
+bd6641ae-e428-4055-b702-e116feb5b6e4,2026-03-09T09:51:28.385Z,anonymous,2026-03-09T09:51:28.385Z,anonymous,Luminous,10,12,1d11da06-2e67-4aa1-8842-d9bbd3b60113,7181a2e0-ba47-478a-adf2-6c49f8e8720d
+458c7e97-5bbd-49df-a19a-58bf595cf53f,2026-03-10T06:20:38.647Z,anonymous,2026-03-10T06:20:38.647Z,anonymous,Amaron,10,18,13cdd8e1-4cce-43eb-a8d5-7b398f300206,7181a2e0-ba47-478a-adf2-6c49f8e8720d
+3f64c392-9ac4-480c-ae65-6efb583f1acd,2026-03-10T06:32:07.495Z,anonymous,2026-03-10T06:32:07.495Z,anonymous,Santa,10,18,17e2ae6b-6dde-4499-8482-70c608e52d03,7181a2e0-ba47-478a-adf2-6c49f8e8720d

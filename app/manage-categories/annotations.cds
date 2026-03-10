@@ -11,7 +11,7 @@ annotate service.Categories with @(
             {
                 $Type : 'UI.DataField',
                 Value : status_ID,
-                Label : 'status_ID',
+                Label : 'status',
             },
         ],
     },
@@ -36,16 +36,40 @@ annotate service.Categories with @(
             Value : categoryName,
         },
         {
-            $Type : 'UI.DataFieldForAction',
-            Action : 'MasterDataService.discontinueCategory',
-            Label : 'discontinueCategory',
-        },
-        {
             $Type : 'UI.DataField',
             Value : status.catStatus,
             Label : 'catStatus',
         },
+        {
+            $Type : 'UI.DataFieldForActionGroup',
+            Actions : [
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'MasterDataService.continueCategory',
+                    Label : 'continueCategory',
+                },
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'MasterDataService.discontinueCategory',
+                    Label : 'discontinueCategory',
+                },
+            ],
+            ID : 'ContinueDiscontinue',
+            Label : 'Continue/Discontinue',
+        },
     ],
+    UI.HeaderInfo : {
+        Title : {
+            $Type : 'UI.DataField',
+            Value : categoryName,
+        },
+        TypeName : '',
+        TypeNamePlural : '',
+        Description : {
+            $Type : 'UI.DataField',
+            Value : status.catStatus,
+        },
+    },
 );
 
 annotate service.Items with @(
@@ -83,7 +107,7 @@ annotate service.Items with @(
             {
                 $Type : 'UI.DataField',
                 Value : status_ID,
-                Label : 'status_ID',
+                Label : 'status',
             },
         ],
     },
@@ -104,11 +128,47 @@ annotate service.Items with @(
             Label : 'gstPercent',
         },
         {
-            $Type : 'UI.DataFieldForAction',
-            Action : 'MasterDataService.discontinueItems',
-            Label : 'discontinueItems',
+            $Type : 'UI.DataField',
+            Value : status_ID,
+            Label : 'status',
+        },
+        {
+            $Type : 'UI.DataFieldForActionGroup',
+            Actions : [
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'MasterDataService.discontinueItems',
+                    Label : 'discontinueItems',
+                },
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'MasterDataService.continueItems',
+                    Label : 'continueItems',
+                },
+            ],
+            ID : 'ContinueDiscontinue',
+            Label : 'Continue/Discontinue',
         },
     ],
+    UI.DataPoint #gstPercent : {
+        Value : gstPercent,
+    },
+    UI.Chart #gstPercent : {
+        ChartType : #Line,
+        Measures : [
+            gstPercent,
+        ],
+        MeasureAttributes : [
+            {
+                DataPoint : '@UI.DataPoint#gstPercent',
+                Role : #Axis1,
+                Measure : gstPercent,
+            },
+        ],
+        Dimensions : [
+            marginPercent,
+        ],
+    },
 );
 
 annotate service.Categories with {
