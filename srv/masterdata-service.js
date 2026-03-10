@@ -1,6 +1,6 @@
 module.exports = function () {
 
-    const { Categories, CategoryStatus, Items, Distributors, Purchases,ItemStatus,MockDistributors } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, Purchases,ItemStatus } = this.entities;
 
     //instead of disabling or hiding delete button, a custom msg is shown when btn clicked
 
@@ -112,11 +112,23 @@ module.exports = function () {
         }
         const gr =await SELECT.one.from('GR').where({originalPO_ID:PO.ID,paymentStatus_ID:grpayment.ID});
         if(gr.length === 0 ){
-            await UPDATE(MockDistributors).set({status_ID:statusRecord.ID}).where({ID:ID});
+            await UPDATE(Distributors).set({status_ID:statusRecord.ID}).where({ID:ID});
         }
         else{
             return req.error(400,`Pay for all remaining ${gr.length} GRs, Then Inactivate`);
         }
+
+    })
+
+    this.on('activateDistributor', async (req) => {
+        
+        const {ID}=req.params[0]; //id of the distributor
+        const statusRecord = await SELECT.one.from('DistributorStatus').where({distriStatus:'ACTIVE'}); 
+        if (!statusRecord) return req.error(404, "Status 'ACTIVE' not found in master data");
+
+        
+            await UPDATE(Distributors).set({status_ID:statusRecord.ID}).where({ID:ID});
+        
 
     })
 }

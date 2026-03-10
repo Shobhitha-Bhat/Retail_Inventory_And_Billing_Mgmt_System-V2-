@@ -22,6 +22,7 @@ entity ItemStatus as projection on db.ItemStatus;
     entity Distributors as projection on db.MockDistributors
     actions{
         action inActivateDistributor() returns Distributors;
+        action activateDistributor() returns Distributors;
     }
     entity DistributorStatus as projection on db.DistributorStatus;
 }

@@ -40,14 +40,26 @@ annotate service.Distributors with @(
             Value : location,
         },
         {
-            $Type : 'UI.DataFieldForAction',
-            Action : 'MasterDataService.inActivateDistributor',
-            Label : 'inActivateDistributor',
-        },
-        {
             $Type : 'UI.DataField',
             Value : status.distriStatus,
             Label : 'distriStatus',
+        },
+        {
+            $Type : 'UI.DataFieldForActionGroup',
+            Actions : [
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'MasterDataService.inActivateDistributor',
+                    Label : 'inActivateDistributor',
+                },
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'MasterDataService.activateDistributor',
+                    Label : 'activateDistributor',
+                },
+            ],
+            ID : 'ActivateInactivate',
+            Label : 'Activate/Inactivate',
         },
     ],
 );
