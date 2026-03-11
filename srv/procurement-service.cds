@@ -1,6 +1,9 @@
 using {my.retailshop as db} from '../db/schema';
 
 service ProcurementService{
+    
+    entity Distributors as projection on db.MockDistributors;
+    
     entity PO as projection on db.PO
     actions{
         action approvePO(); 

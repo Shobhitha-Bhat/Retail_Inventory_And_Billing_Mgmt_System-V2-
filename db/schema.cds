@@ -35,6 +35,8 @@ entity Items : cuid, managed {
     //     DISCONTINUED;
     // };
     status:Association to ItemStatus;
+    itemBasePrice:Decimal(10,2);
+    totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));
 
 }
 
@@ -80,7 +82,7 @@ entity PO : cuid, managed {
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
     supplier : Association to MockDistributors;
-    totalAmount:Decimal(10,2); //calculated from poitems
+    totalAmount:Decimal(10,2) @Core.Computed; //calculated from poitems
 }
 
 

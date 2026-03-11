@@ -109,6 +109,16 @@ annotate service.Items with @(
                 Value : status_ID,
                 Label : 'status',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : itemBasePrice,
+                Label : 'itemBasePrice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : totalCostprice,
+                Label : 'totalCostprice',
+            },
         ],
     },
     UI.LineItem #ItemsInCategory : [
@@ -116,16 +126,6 @@ annotate service.Items with @(
             $Type : 'UI.DataField',
             Value : itemName,
             Label : 'itemName',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : marginPercent,
-            Label : 'marginPercent',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : gstPercent,
-            Label : 'gstPercent',
         },
         {
             $Type : 'UI.DataField',
@@ -149,6 +149,11 @@ annotate service.Items with @(
             ID : 'ContinueDiscontinue',
             Label : 'Continue/Discontinue',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : totalCostprice,
+            Label : 'totalCostprice',
+        },
     ],
     UI.DataPoint #gstPercent : {
         Value : gstPercent,
@@ -168,6 +173,14 @@ annotate service.Items with @(
         Dimensions : [
             marginPercent,
         ],
+    },
+    UI.HeaderInfo : {
+        Title : {
+            $Type : 'UI.DataField',
+            Value : itemName,
+        },
+        TypeName : '',
+        TypeNamePlural : '',
     },
 );
 

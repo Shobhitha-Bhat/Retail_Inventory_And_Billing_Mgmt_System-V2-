@@ -18,6 +18,11 @@ annotate service.PO with @(
                 Value : status_ID,
                 Label : 'status_ID',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : supplier_ID,
+                Label : 'supplier_ID',
+            },
         ],
     },
     UI.Facets : [
@@ -88,12 +93,7 @@ annotate service.POItems with @(
         {
             $Type : 'UI.DataField',
             Value : poItem_ID,
-            Label : 'poItem_ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : poItem.itemName,
-            Label : 'itemName',
+            Label : 'poItem',
         },
     ],
     UI.Facets : [
@@ -175,6 +175,42 @@ annotate service.PO with {
                 },
             ],
             Label : 'POStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
+
+annotate service.PO with {
+    supplier @(
+        Common.ExternalID : supplier.distributorName,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Distributors',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : supplier_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'Distributor',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
+
+annotate service.POItems with {
+    poItem @(
+        Common.ExternalID : poItem.itemName,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Items',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : poItem_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'poItem',
         },
         Common.ValueListWithFixedValues : true,
 )};

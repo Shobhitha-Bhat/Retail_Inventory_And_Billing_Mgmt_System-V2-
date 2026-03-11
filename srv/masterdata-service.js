@@ -1,4 +1,5 @@
-module.exports = function () {
+const cds = require('@sap/cds');
+module.exports = cds.service.impl(async function() {
 
     const { Categories, CategoryStatus, Items, Distributors, Purchases,ItemStatus } = this.entities;
 
@@ -28,6 +29,7 @@ module.exports = function () {
     });
 
 
+    
     this.on('discontinueCategory', async (req) => {
         const { ID } = req.params[0];
         const statusRecord = await SELECT.one.from('CategoryStatus').where({ catStatus: 'TEMPORARILY INACTIVE' });
@@ -131,4 +133,4 @@ module.exports = function () {
         
 
     })
-}
+})

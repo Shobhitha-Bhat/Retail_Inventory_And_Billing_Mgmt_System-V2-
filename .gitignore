@@ -23,3 +23,6 @@ Thumbs.db
 !.vscode/settings.json
 
 
+db.sqlite-shm
+db.sqlite-wal
+
