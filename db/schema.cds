@@ -71,7 +71,7 @@ entity MockCustomers : cuid, managed {
 
 
 //PROCUREMENT
-
+@odata.draft.enabled
 entity PO : cuid, managed {
     // status   : String enum {
     //     Open;
@@ -82,7 +82,10 @@ entity PO : cuid, managed {
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
     supplier : Association to MockDistributors;
-    totalAmount:Decimal(10,2) @Core.Computed; //calculated from poitems
+    virtual totalPOAmount : Decimal(15, 2) ;
+    virtual paidAmount: Decimal(15,2) ;
+    virtual remainingAmount: Decimal(15,2) ;
+    
 }
 
 
@@ -98,8 +101,8 @@ entity POItems : cuid, managed {
 
     //Based on Mutual Agreement with the Distributor.
     //for transactional data snapshot to keep previous data
-    gstPercent : Decimal(5, 2);
-    itemPrice  : Decimal(10, 2);
+    // gstPercent : Decimal(5, 2);
+    // itemPrice  : Decimal(10, 2);
 }
 
 entity GR : cuid, managed {

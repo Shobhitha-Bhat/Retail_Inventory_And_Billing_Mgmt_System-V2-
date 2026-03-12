@@ -4,11 +4,6 @@ annotate service.PO with @(
         $Type : 'UI.FieldGroupType',
         Data : [
             {
-                $Type : 'UI.DataField',
-                Label : 'totalAmount',
-                Value : totalAmount,
-            },
-            {
                 $Type : 'UI.DataFieldForAction',
                 Action : 'ProcurementService.approvePO',
                 Label : 'approvePO',
@@ -16,12 +11,27 @@ annotate service.PO with @(
             {
                 $Type : 'UI.DataField',
                 Value : status_ID,
-                Label : 'status_ID',
+                Label : 'status',
             },
             {
                 $Type : 'UI.DataField',
                 Value : supplier_ID,
                 Label : 'supplier_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : totalPOAmount,
+                Label : 'totalPOAmount',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : paidAmount,
+                Label : 'paidAmount',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : remainingAmount,
+                Label : 'remainingAmount',
             },
         ],
     },
@@ -43,7 +53,12 @@ annotate service.PO with @(
         {
             $Type : 'UI.DataField',
             Value : ID,
-            Label : 'ID',
+            Label : 'PO_ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : totalPOAmount,
+            Label : 'totalPOAmount',
         },
         {
             $Type : 'UI.DataField',
@@ -51,14 +66,31 @@ annotate service.PO with @(
             Label : 'supplier_ID',
         },
         {
-            $Type : 'UI.DataField',
-            Label : 'totalAmount',
-            Value : totalAmount,
-        },
-        {
             $Type : 'UI.DataFieldForAction',
             Action : 'ProcurementService.approvePO',
             Label : 'approvePO',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : status_ID,
+            Label : 'status',
+        },
+        {
+            $Type : 'UI.DataFieldForActionGroup',
+            Actions : [
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'ProcurementService.closePO',
+                    Label : 'closePO',
+                },
+                {
+                    $Type : 'UI.DataFieldForAction',
+                    Action : 'ProcurementService.openPO',
+                    Label : 'openPO',
+                },
+            ],
+            ID : 'POStatus',
+            Label : 'PO Status',
         },
     ],
 );
@@ -77,23 +109,18 @@ annotate service.POItems with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : itemPrice,
-            Label : 'itemPrice',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : quantity,
-            Label : 'quantity',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : openQty,
-            Label : 'openQty',
-        },
-        {
-            $Type : 'UI.DataField',
             Value : poItem_ID,
             Label : 'poItem',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : poItem.totalCostprice,
+            Label : 'Unit Item CostPrice (Including GST)',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : itemsYetToReceive,
+            Label : 'itemsYetToReceive',
         },
     ],
     UI.Facets : [
@@ -144,18 +171,28 @@ annotate service.POItems with @(
             },
             {
                 $Type : 'UI.DataField',
-                Value : poItem.itemName,
-                Label : 'itemName',
+                Value : poItem_ID,
+                Label : 'poItem_ID',
             },
             {
                 $Type : 'UI.DataField',
-                Value : poItem.marginPercent,
-                Label : 'marginPercent',
+                Value : quantity,
+                Label : 'UnitsRequired',
             },
             {
                 $Type : 'UI.DataField',
                 Value : poItem.gstPercent,
                 Label : 'gstPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : poItem.itemBasePrice,
+                Label : 'itemBasePrice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : poItem.totalCostprice,
+                Label : 'UnitItemCostprice(including GST)',
             },
         ],
     },
