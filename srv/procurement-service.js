@@ -1,5 +1,5 @@
 module.exports = function(){
-    const { Categories, CategoryStatus, Items, Distributors, PO,POItems,POStatus,ItemStatus } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, PO,POItems,POStatus,ItemStatus,IndependentDistributor,DistributorOrderItems } = this.entities;
     this.on('DELETE','PO',async(req)=>{
         req.reject(400,'PO cant be deleted. Close PO instead. ')
     })
@@ -53,7 +53,7 @@ module.exports = function(){
 //     })
 
 
-//to calculate total, paid and remaining amount
+//to calculate total, paid and remaining amount == ony for frontend purpose. there are not stored in db
 this.after('READ', 'PO', async (data, req) => {
         const pos = Array.isArray(data) ? data : [data]
         for (const po of pos) {
@@ -87,8 +87,15 @@ this.after('READ', 'PO', async (data, req) => {
 
 
     this.on('approvePO',async(req)=>{
-        //from the list of POs that is created , approve -> procurement manager
-        //populate Distributor with the PO and its POItems and with an option to Trigger GR.(open quantity)
+        const {ID}=req.params[0]; //id of the selected PO
+
+        const po=await SELECT.one.from(PO).where({ID:ID})
+        const poitems=await SELECT.from(POItems).where({parentPO_ID:ID})
+        for(const items of poitems){
+            const item=await SELECT.from(Items).where({ID:items.poItem_ID})
+            await INSERT.into(IndependentDistributor).entries()
+        }
+        git st
     })
 
     this.on('markInspected',async(req)=>{

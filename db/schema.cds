@@ -28,7 +28,6 @@ entity CategoryStatus:cuid{
 entity Items : cuid, managed {
     itemName      : String;
     marginPercent : Decimal(5, 2);
-    gstPercent    : Decimal(5, 2);
     category      : Association to Categories ;
     // status        : String enum {
     //     ACTIVE;
@@ -36,6 +35,7 @@ entity Items : cuid, managed {
     // };
     status:Association to ItemStatus;
     itemBasePrice:Decimal(10,2);
+    gstPercent    : Decimal(5, 2);
     totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));
 
 }
@@ -54,6 +54,8 @@ entity MockDistributors : cuid, managed {
     // };
     status:Association to DistributorStatus;
     receievedPOs: Association to many PO on receievedPOs.supplier=$self;
+    //inorder to show possible distribuors in distributor portal 
+    portalAccess    : Association to many IndependentDistributor on portalAccess.toDistributor = $self;
 }
 
 
@@ -68,6 +70,7 @@ entity MockCustomers : cuid, managed {
     city         : String;
     contactNumber:String(20)  @UI.CreateHidden;
 }
+
 
 
 //PROCUREMENT
@@ -254,3 +257,25 @@ entity Departments:cuid{
     dept:String;
 }
 
+
+//================================================================//
+//================================================================//
+//============INDEPENDENT DISTRIBUTOR PORTAL======================//
+
+entity IndependentDistributor:cuid,managed{
+    poID:UUID;
+    toDistributor : Association to MockDistributors;
+    orderItems  : Composition of many DistributorOrderItems
+                   on orderItems.parentDistributor = $self;
+    virtual totalOrderAmount : Decimal(15, 2) ;
+    
+}
+
+entity DistributorOrderItems:cuid,managed{
+    parentDistributor   : Association to IndependentDistributor;
+    itemName   : String;
+    quantity   : Integer;
+    itemBasePrice:Decimal(10, 2);
+    gstPercent    : Decimal(5, 2);
+    totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));
+}

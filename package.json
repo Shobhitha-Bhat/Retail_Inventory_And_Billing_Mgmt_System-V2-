@@ -14,7 +14,8 @@
     "watch-manage-gr": "cds watch --open managegr/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-inventory": "cds watch --open inventory/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-passbook": "cds watch --open passbook/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "watch-sales": "cds watch --open sales/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-sales": "cds watch --open sales/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-distributor-access-portal": "cds watch --open distributoraccessportal/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "cds": {
     "requires": {
@@ -22,8 +23,8 @@
         "kind": "sqlite"
       }
     },
-    "log":{
-      "level":"error"
+    "log": {
+      "level": "error"
     }
   },
   "keywords": [],
@@ -53,6 +54,9 @@
     "app/inventory",
     "app/passbook",
     "app/inventory",
-    "app/sales"
+    "app/sales",
+    "app/distributor-portal",
+    "app/distributor-portal",
+    "app/distributor-access-portal"
   ]
 }

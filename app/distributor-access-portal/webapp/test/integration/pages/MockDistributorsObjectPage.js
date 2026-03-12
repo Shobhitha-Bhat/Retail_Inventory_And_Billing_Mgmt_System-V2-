@@ -8,9 +8,9 @@ sap.ui.define(['sap/fe/test/ObjectPage'], function(ObjectPage) {
 
     return new ObjectPage(
         {
-            appId: 'distributorportal',
-            componentId: 'POObjectPage',
-            contextPath: '/Distributors/receievedPOs'
+            appId: 'distributoraccessportal',
+            componentId: 'MockDistributorsObjectPage',
+            contextPath: '/MockDistributors'
         },
         CustomPageDefinitions
     );

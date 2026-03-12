@@ -1,7 +1,7 @@
 {
-  "_version": "1.81.0",
+  "_version": "1.82.0",
   "sap.app": {
-    "id": "distributorportal",
+    "id": "distributoraccessportal",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -12,8 +12,8 @@
     "resources": "resources.json",
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
-      "version": "1.20.2",
-      "toolsId": "ba1ad94a-08a6-4d3d-9292-848cd4a81227"
+      "version": "1.20.4",
+      "toolsId": "1b8d2864-8f18-4b42-81a9-84cdd39f1e4b"
     },
     "dataSources": {
       "mainService": {
@@ -21,7 +21,7 @@
         "type": "OData",
         "settings": {
           "annotations": [],
-          "odataVersion": "4.0"
+          "odataVersion": "4.01"
         }
       }
     }
@@ -49,8 +49,7 @@
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
-        "sap.fe.templates": {},
-        "sap.f": {}
+        "sap.fe.templates": {}
       }
     },
     "contentDensities": {
@@ -61,7 +60,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "distributorportal.i18n.i18n"
+          "bundleName": "distributoraccessportal.i18n.i18n"
         }
       },
       "": {
@@ -82,52 +81,37 @@
       "css": []
     },
     "routing": {
-      "config": {
-        "flexibleColumnLayout": {
-          "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
-          "defaultThreeColumnLayoutType": "ThreeColumnsEndExpanded"
-        },
-        "routerClass": "sap.f.routing.Router"
-      },
+      "config": {},
       "routes": [
         {
           "pattern": ":?query:",
-          "name": "DistributorsList",
-          "target": [
-            "DistributorsList"
-          ]
+          "name": "MockDistributorsList",
+          "target": "MockDistributorsList"
         },
         {
-          "pattern": "Distributors({key}):?query:",
-          "name": "DistributorsObjectPage",
-          "target": [
-            "DistributorsList",
-            "DistributorsObjectPage"
-          ]
+          "pattern": "MockDistributors({key}):?query:",
+          "name": "MockDistributorsObjectPage",
+          "target": "MockDistributorsObjectPage"
         },
         {
-          "name": "Distributors_receievedPOsObjectPage",
-          "pattern": "Distributors({key})/receievedPOs({receievedPOsKey}):?query:",
-          "target": [
-            "DistributorsList",
-            "DistributorsObjectPage",
-            "Distributors_receievedPOsObjectPage"
-          ]
+          "name": "MockDistributors_portalAccessObjectPage",
+          "pattern": "MockDistributors({key})/portalAccess({portalAccessKey}):?query:",
+          "target": "MockDistributors_portalAccessObjectPage"
         }
       ],
       "targets": {
-        "DistributorsList": {
+        "MockDistributorsList": {
           "type": "Component",
-          "id": "DistributorsList",
+          "id": "MockDistributorsList",
           "name": "sap.fe.templates.ListReport",
           "options": {
             "settings": {
-              "contextPath": "/Distributors",
+              "contextPath": "/MockDistributors",
               "variantManagement": "Page",
               "navigation": {
-                "Distributors": {
+                "MockDistributors": {
                   "detail": {
-                    "route": "DistributorsObjectPage"
+                    "route": "MockDistributorsObjectPage"
                   }
                 }
               },
@@ -140,51 +124,38 @@
               },
               "initialLoad": "Enabled"
             }
-          },
-          "controlAggregation": "beginColumnPages",
-          "contextPattern": ""
+          }
         },
-        "DistributorsObjectPage": {
+        "MockDistributorsObjectPage": {
           "type": "Component",
-          "id": "DistributorsObjectPage",
+          "id": "MockDistributorsObjectPage",
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
               "editableHeaderContent": false,
-              "contextPath": "/Distributors",
+              "contextPath": "/MockDistributors",
               "navigation": {
-                "receievedPOs": {
+                "portalAccess": {
                   "detail": {
-                    "route": "Distributors_receievedPOsObjectPage"
+                    "route": "MockDistributors_portalAccessObjectPage"
                   }
                 }
-              },
-              "sectionLayout": "Tabs"
+              }
             }
-          },
-          "controlAggregation": "midColumnPages",
-          "contextPattern": "/Distributors({key})"
+          }
         },
-        "Distributors_receievedPOsObjectPage": {
+        "MockDistributors_portalAccessObjectPage": {
           "type": "Component",
-          "id": "Distributors_receievedPOsObjectPage",
+          "id": "MockDistributors_portalAccessObjectPage",
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
               "navigation": {},
-              "contextPath": "/Distributors/receievedPOs"
+              "contextPath": "/MockDistributors/portalAccess"
             }
-          },
-          "controlAggregation": "endColumnPages",
-          "contextPattern": "/Distributors({key})/receievedPOs({receievedPOsKey})"
+          }
         }
       }
-    },
-    "rootView": {
-      "viewName": "sap.fe.templates.RootContainer.view.Fcl",
-      "type": "XML",
-      "async": true,
-      "id": "appRootView"
     }
   },
   "sap.fiori": {

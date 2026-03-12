@@ -10,7 +10,7 @@ sap.ui.define([
         opaTest("Start application", function (Given, When, Then) {
             Given.iStartMyApp();
 
-            Then.onTheDistributorsList.iSeeThisPage();
+            Then.onTheMockDistributorsList.iSeeThisPage();
 
         });
 
@@ -18,12 +18,12 @@ sap.ui.define([
         opaTest("Navigate to ObjectPage", function (Given, When, Then) {
             // Note: this test will fail if the ListReport page doesn't show any data
             
-            When.onTheDistributorsList.onFilterBar().iExecuteSearch();
+            When.onTheMockDistributorsList.onFilterBar().iExecuteSearch();
             
-            Then.onTheDistributorsList.onTable().iCheckRows();
+            Then.onTheMockDistributorsList.onTable().iCheckRows();
 
-            When.onTheDistributorsList.onTable().iPressRow(0);
-            Then.onTheDistributorsObjectPage.iSeeThisPage();
+            When.onTheMockDistributorsList.onTable().iPressRow(0);
+            Then.onTheMockDistributorsObjectPage.iSeeThisPage();
 
         });
 
