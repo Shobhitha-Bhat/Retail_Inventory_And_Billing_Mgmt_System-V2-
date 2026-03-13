@@ -27,5 +27,18 @@ service DistributorService{
     actions{
         action triggerGRtoRetailer();
     }
-    entity DistributorOrderItems as projection on db.DistributorOrderItems;
+    entity DistributorOrderItems as projection on db.DistributorOrderItems{
+            *,
+            @Core.Computed
+            (
+                quantity - coalesce(
+                    //coalesce(a,b) if either of them is NULL the other is returned
+                    (
+                        select sum(g.quantityReceived - g.quantityDamaged) from db.GRItems as g
+                        where
+                            g.poItem.ID = ID
+                    ), 0
+                )
+            ) as itemsYetToSend : Integer
+        }
 }

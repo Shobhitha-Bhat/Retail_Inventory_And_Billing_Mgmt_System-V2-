@@ -53,7 +53,7 @@ entity MockDistributors : cuid, managed {
     //     INACTIVE;
     // };
     status:Association to DistributorStatus;
-    receievedPOs: Association to many PO on receievedPOs.supplier=$self;
+    // receievedPOs: Association to many PO on receievedPOs.supplier=$self;
     //inorder to show possible distribuors in distributor portal 
     portalAccess    : Association to many IndependentDistributor on portalAccess.toDistributor = $self;
 }
@@ -125,8 +125,11 @@ entity GR : cuid, managed {
     //     Paid;
     // };
     paymentStatus:Association to GRPaymentStatus;
-    totalAmount  : Decimal(15,2);   // actual payable amount
-    amountPaid   : Decimal(15,2);
+    // totalAmount  : Decimal(15,2);   // actual payable amount
+    // amountPaid   : Decimal(15,2);
+    virtual totalPOAmount : Decimal(15, 2) ;
+    virtual paidAmount: Decimal(15,2) ;
+    virtual remainingAmount: Decimal(15,2) ;
 }
 
 entity GRPaymentStatus:cuid{

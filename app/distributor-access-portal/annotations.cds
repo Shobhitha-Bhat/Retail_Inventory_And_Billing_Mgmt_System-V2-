@@ -145,18 +145,18 @@ annotate service.DistributorOrderItems with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : quantity,
-            Label : 'quantity',
-        },
-        {
-            $Type : 'UI.DataField',
             Value : totalCostprice,
             Label : 'UnitItemCostprice',
         },
         {
             $Type : 'UI.DataField',
-            Value : parentDistributor_ID,
-            Label : 'parentDistributor_ID',
+            Value : quantity,
+            Label : 'quantity',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : itemsYetToSend,
+            Label : 'itemsYetToSend',
         },
     ],
 );

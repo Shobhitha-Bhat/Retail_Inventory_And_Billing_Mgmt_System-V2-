@@ -108,11 +108,11 @@ const prepareCSVValue = (val) => {
 };
 
 cds.on('served', () => {
-    console.log('--- 🚀 Backup System Active: Press CTRL+C once to save data ---')
+    console.log(' Backup System Active: Press CTRL+C once to save data ---')
 })
 
 process.on('SIGINT', async () => {
-    console.log('\n[Backup] 🛑 Shutdown detected. Starting CSV export...')
+    console.log('\n[Backup] Shutdown detected. Starting CSV export...')
     
     try {
         const db = await cds.connect.to('db')
@@ -153,15 +153,15 @@ process.on('SIGINT', async () => {
                 
                 // 5. Atomic Write to File
                 fs.writeFileSync(filePath, `${headers}\n${rows}`, 'utf8')
-                console.log(`[Backup] ✅ Saved ${data.length} records to ${fileName}`)
+                console.log(`[Backup]  Saved ${data.length} records to ${fileName}`)
             } else {
-                console.log(`[Backup] ℹ️ Skipping ${shortName} (No data found)`)
+                console.log(`[Backup] Skipping ${shortName} (No data found)`)
             }
         }
     } catch (err) {
-        console.error('[Backup] ❌ Error during save:', err)
+        console.error('[Backup]  Error during save:', err)
     } finally {
-        console.log('[Backup] 👋 Backup complete. Shutting down.')
+        console.log('[Backup]  Backup complete. Shutting down.')
         process.exit()
     }
 })
