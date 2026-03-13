@@ -72,6 +72,11 @@ annotate service.IndependentDistributor with @(
             Value : totalOrderAmount,
             Label : 'totalOrderAmount',
         },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'DistributorService.triggerGRtoRetailer',
+            Label : 'triggerGRtoRetailer',
+        },
     ],
     UI.Facets : [
         {
@@ -147,6 +152,11 @@ annotate service.DistributorOrderItems with @(
             $Type : 'UI.DataField',
             Value : totalCostprice,
             Label : 'UnitItemCostprice',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : parentDistributor_ID,
+            Label : 'parentDistributor_ID',
         },
     ],
 );

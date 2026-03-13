@@ -23,9 +23,9 @@ using {my.retailshop as db} from '../db/schema';
 
 service DistributorService{
     entity MockDistributors as projection on db.MockDistributors;
-    entity IndependentDistributor as projection on db.IndependentDistributor;
-    entity DistributorOrderItems as projection on db.DistributorOrderItems
+    entity IndependentDistributor as projection on db.IndependentDistributor
     actions{
-        action triggerGR();
+        action triggerGRtoRetailer();
     }
+    entity DistributorOrderItems as projection on db.DistributorOrderItems;
 }

@@ -4,9 +4,12 @@ service ProcurementService {
 
     entity Distributors        as projection on db.MockDistributors;
     entity Items               as projection on db.Items;
+    entity IndependentDistributor as projection on db.IndependentDistributor;
+    entity DistributorOrderItems as projection on db.DistributorOrderItems;
 
     entity PO  as projection on db.PO 
         actions {
+            // action approvePO() returns PO;
             action approvePO() returns PO;
             action closePO()   returns PO;
             action openPO()    returns PO;
