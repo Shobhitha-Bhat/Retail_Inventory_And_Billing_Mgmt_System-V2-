@@ -16,7 +16,6 @@ service ProcurementService {
         };
 
     entity POStatus as projection on db.POStatus;
-
     entity POItems as projection on db.POItems {
             *,
             @Core.Computed
@@ -39,7 +38,6 @@ service ProcurementService {
         }
 
     entity GRStatus as projection on db.GRStatus;
-
     entity GRItems as projection on db.GRItems
         actions {
             action markInspected(quantityDamaged: Integer) returns GRItems;

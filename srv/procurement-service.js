@@ -113,6 +113,7 @@ module.exports = function () {
                 const eachItemPriceWithQuantity = (price * qty) + ((price * qty * gst) / 100);
                 total += eachItemPriceWithQuantity;
                 itemsToInsert.push({
+                    refPOItemID:item.ID,
                     itemName: masterItem.itemName,
                     quantity: qty,
                     itemBasePrice: price,

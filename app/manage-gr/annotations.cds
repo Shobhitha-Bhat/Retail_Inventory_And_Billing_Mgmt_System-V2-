@@ -5,18 +5,18 @@ annotate service.GR with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'totalAmount',
-                Value : totalAmount,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'amountPaid',
-                Value : amountPaid,
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : status.grStatus,
                 Label : 'grStatus',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : totalPOAmount,
+                Label : 'totalPOAmount',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : paymentStatus_ID,
+                Label : 'paymentStatus_ID',
             },
         ],
     },
@@ -41,24 +41,9 @@ annotate service.GR with @(
             Label : 'ID',
         },
         {
-            $Type : 'UI.DataField',
-            Label : 'totalAmount',
-            Value : totalAmount,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'amountPaid',
-            Value : amountPaid,
-        },
-        {
             $Type : 'UI.DataFieldForAction',
             Action : 'ProcurementService.approveGR',
             Label : 'approveGR',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : originalPO_ID,
-            Label : 'originalPO_ID',
         },
         {
             $Type : 'UI.DataField',
@@ -69,6 +54,16 @@ annotate service.GR with @(
             $Type : 'UI.DataField',
             Value : paymentStatus.grPayStatus,
             Label : 'grPayStatus',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : originalPO.ID,
+            Label : 'poID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : totalPOAmount,
+            Label : 'totalPOAmount',
         },
     ],
 );
@@ -92,6 +87,16 @@ annotate service.GRItems with @(
         },
         {
             $Type : 'UI.DataField',
+            Value : poItem.poItem.itemName,
+            Label : 'itemName',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : poItem_ID,
+            Label : 'poItem_ID',
+        },
+        {
+            $Type : 'UI.DataField',
             Value : quantityDamaged,
             Label : 'quantityDamaged',
         },
@@ -99,11 +104,6 @@ annotate service.GRItems with @(
             $Type : 'UI.DataField',
             Value : quantityReceived,
             Label : 'quantityReceived',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : poItem_ID,
-            Label : 'poItem_ID',
         },
         {
             $Type : 'UI.DataField',
@@ -125,4 +125,8 @@ annotate service.GRItems with @(
         ],
     },
 );
+
+annotate service.GR with {
+    paymentStatus @Common.ExternalID : paymentStatus.grPayStatus
+};
 

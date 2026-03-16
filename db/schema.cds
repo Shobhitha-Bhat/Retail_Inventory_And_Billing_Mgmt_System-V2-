@@ -54,6 +54,7 @@ entity MockDistributors : cuid, managed {
     // };
     status:Association to DistributorStatus;
     // receievedPOs: Association to many PO on receievedPOs.supplier=$self;
+    
     //inorder to show possible distribuors in distributor portal 
     portalAccess    : Association to many IndependentDistributor on portalAccess.toDistributor = $self;
 }
@@ -127,7 +128,7 @@ entity GR : cuid, managed {
     paymentStatus:Association to GRPaymentStatus;
     // totalAmount  : Decimal(15,2);   // actual payable amount
     // amountPaid   : Decimal(15,2);
-    virtual totalPOAmount : Decimal(15, 2) ;
+    totalPOAmount : Decimal(15, 2) ;
     virtual paidAmount: Decimal(15,2) ;
     virtual remainingAmount: Decimal(15,2) ;
 }
@@ -145,7 +146,7 @@ entity GRItems : cuid, managed {
     poItem           : Association to POItems;
     // items            : Association to Items;
     quantityReceived : Integer;
-    quantityDamaged  : Integer;
+    quantityDamaged  : Integer default 0;
     // inspectionStatus : String enum {
     //     Pending;
     //     Inspected;
@@ -276,6 +277,7 @@ entity IndependentDistributor:cuid,managed{
 
 entity DistributorOrderItems:cuid,managed{
     parentDistributor   : Association to IndependentDistributor;
+    refPOItemID:UUID;
     itemName   : String;
     quantity   : Integer;
     itemBasePrice:Decimal(10, 2);

@@ -41,4 +41,8 @@ service DistributorService{
                 )
             ) as itemsYetToSend : Integer
         }
+    entity GRStatus as projection on db.GRStatus;
+    entity GRPaymentStatus as projection on db.GRPaymentStatus;
+    entity GRItemInspectStatus as projection on db.GRItemInspectStatus;
+    entity GR as projection on db.GR;
 }

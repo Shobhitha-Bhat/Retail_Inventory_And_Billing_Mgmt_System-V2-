@@ -1,6 +1,8 @@
+const SELECT = require("@sap/cds/lib/ql/SELECT");
+
 module.exports=function(){
 
-    const { IndependentDistributor, DistributorOrderItems } = this.entities;
+    const { IndependentDistributor, DistributorOrderItems,GRStatus,GRPaymentStatus,GRItemInspectStatus,GR } = this.entities;
 
     this.after('READ', 'IndependentDistributor', async (data, req) => {
     const pos = Array.isArray(data) ? data : [data];
@@ -24,10 +26,53 @@ module.exports=function(){
 
 
     this.on('triggerGRtoRetailer',async(req)=>{
-        req.info("Requested Items sent. Confirm With the Retailer.")
         //once the table is populated with Po requests from PO, click trigger.approveGR
         //once approved , populate with GR and GRItems with StockRcvd_inspection_pending state
         //in grItems status is pending for inspection status
+
+        const { ID } = req.params[1];
+        const grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'StockRcvd_InspectionInProgress' });
+        if (!grStatusRecord) return req.error(404, "Status 'StockRcvd_InspectionInProgress' not found");
+
+        const grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Pending' });
+        if (!grPaymentStatus) return req.error(404, "Status 'Pending' not found");
+
+        const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Pending' });
+        if (!grItemInspectStatus) return req.error(404, "Status 'Pending' not found");
+        
+        const triggeredPO= await SELECT.one.from(IndependentDistributor).where({ID:ID})
+        if (!triggeredPO) return req.error(400, `No Distributor record found for ID: ${ID}`);
+        const items = await SELECT.from(DistributorOrderItems).where({parentDistributor:ID})
+
+        const itemsToInsert=[];
+        let total=0;
+        for(const item of items){
+            const price = Number(item.itemBasePrice) || 0;
+                const gst = Number(item.gstPercent) || 0;
+                const qty = Number(item.quantity) || 0;
+
+                const eachItemPriceWithQuantity = (price * qty) + ((price * qty * gst) / 100);
+                total += eachItemPriceWithQuantity;
+            itemsToInsert.push({
+                // parentGR automatically mapped when deep inserted
+                poItem_ID: item.refPOItemID,
+                quantityReceived:item.quantity,
+                inspectionStatus_ID:grItemInspectStatus.ID,
+                
+            })
+        }
+        
+        await INSERT.into(GR).entries({
+            originalPO_ID:triggeredPO.poID,
+            status_ID:grStatusRecord.ID,
+            paymentStatus_ID:grPaymentStatus.ID,
+            grItems:itemsToInsert,
+            totalPOAmount:total,
+        })
+
+
+
+        req.info("Requested Items sent. Confirm With the Retailer.")
     })
 }
 
