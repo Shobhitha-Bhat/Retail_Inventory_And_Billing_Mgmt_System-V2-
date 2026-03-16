@@ -272,7 +272,11 @@ entity IndependentDistributor:cuid,managed{
     orderItems  : Composition of many DistributorOrderItems
                    on orderItems.parentDistributor = $self;
     virtual totalOrderAmount : Decimal(15, 2) ;
-    
+    requestStatus:Association to RequestStatus;
+}
+
+entity RequestStatus:cuid,managed{
+    reqStatus:String;   //open ... close
 }
 
 entity DistributorOrderItems:cuid,managed{

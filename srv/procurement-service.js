@@ -2,7 +2,7 @@ const INSERT = require("@sap/cds/lib/ql/INSERT");
 const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports = function () {
-    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GRItems, GRItemInspectStatus,RequestStatus } = this.entities;
     this.on('DELETE', 'PO', async (req) => {
         req.reject(400, 'PO cant be deleted. Close PO instead. ')
     })
@@ -95,10 +95,13 @@ module.exports = function () {
         let statusRecord = await SELECT.one.from(POStatus).where({ poStatus: 'Pending' });
         if (!statusRecord) return req.error(404, "Status 'Pending' not found");
 
-        const po = await SELECT.one.from(PO).where({ ID: ID,status_ID:statusRecord.ID })
+        const po = await SELECT.one.from(PO).where({ ID: ID, status_ID: statusRecord.ID })
         if (!po) return req.error(404, "PO ALready Approved");
 
         const poitems = await SELECT.from(POItems).where({ parentPO_ID: ID })
+
+        const reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
+        if (!reStatus) return req.error(404, "Status 'Open' not found");
 
         const itemsToInsert = [];
         let total = 0;
@@ -113,7 +116,7 @@ module.exports = function () {
                 const eachItemPriceWithQuantity = (price * qty) + ((price * qty * gst) / 100);
                 total += eachItemPriceWithQuantity;
                 itemsToInsert.push({
-                    refPOItemID:item.ID,
+                    refPOItemID: item.ID,
                     itemName: masterItem.itemName,
                     quantity: qty,
                     itemBasePrice: price,
@@ -125,13 +128,14 @@ module.exports = function () {
         await INSERT.into(IndependentDistributor).entries({
             poID: ID,
             toDistributor_ID: po.supplier_ID,
+            requestStatus_ID:reStatus.ID,
             orderItems: itemsToInsert // This matches the 'Composition of many' relationship name
         });
-        
+
         //set status to Open after Approval
         statusRecord = await SELECT.one.from(POStatus).where({ poStatus: 'Open' });
         if (!statusRecord) return req.error(404, "Status 'Open' not found");
-        await UPDATE(PO).set({status_ID:statusRecord.ID}).where({ID:ID})
+        await UPDATE(PO).set({ status_ID: statusRecord.ID }).where({ ID: ID })
 
         req.info("PO Approved and Sent to Distributor.");
 
@@ -141,6 +145,17 @@ module.exports = function () {
     this.on('markInspected', async (req) => {
         //change status to inspected for the grItems.
         //manually enter the quantity damaged if any. if no, enter 0;
+        const { quantityDamaged } = req.data
+        const { ID } = req.params[1]
+        const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
+        if (!grItemInspectStatus) return req.error(404, "Status 'Inspected' not found");
+        const gritem = await SELECT.one.from(GRItems).where({ ID: ID })
+        if (quantityDamaged > gritem.quantityReceived) {
+            return req.error(400, "Quantity damaged cant be greater than quantity received")
+        }
+        await UPDATE(GRItems).set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged }).where({ ID: ID });
+        req.info("Item Inspected")
+        return await SELECT.one.from(GRItems).where({ ID: ID })
     })
 
     this.on('approveGR', async (req) => {

@@ -75,23 +75,6 @@ annotate service.PO with @(
             Value : status_ID,
             Label : 'status',
         },
-        {
-            $Type : 'UI.DataFieldForActionGroup',
-            Actions : [
-                {
-                    $Type : 'UI.DataFieldForAction',
-                    Action : 'ProcurementService.closePO',
-                    Label : 'closePO',
-                },
-                {
-                    $Type : 'UI.DataFieldForAction',
-                    Action : 'ProcurementService.openPO',
-                    Label : 'openPO',
-                },
-            ],
-            ID : 'POStatus',
-            Label : 'PO Status',
-        },
     ],
 );
 

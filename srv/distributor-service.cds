@@ -22,12 +22,13 @@ using {my.retailshop as db} from '../db/schema';
 // }
 
 service DistributorService{
+    entity GRItems as projection on db.GRItems;
     entity MockDistributors as projection on db.MockDistributors;
     entity IndependentDistributor as projection on db.IndependentDistributor
     actions{
         action triggerGRtoRetailer();
     }
-    entity DistributorOrderItems as projection on db.DistributorOrderItems{
+    entity DistributorOrderItems as projection on db.DistributorOrderItems as DOI{
             *,
             @Core.Computed
             (
@@ -36,11 +37,12 @@ service DistributorService{
                     (
                         select sum(g.quantityReceived - g.quantityDamaged) from db.GRItems as g
                         where
-                            g.poItem.ID = ID
+                            g.poItem.ID = DOI.refPOItemID
                     ), 0
                 )
             ) as itemsYetToSend : Integer
         }
+    entity RequestStatus as projection on db.RequestStatus;
     entity GRStatus as projection on db.GRStatus;
     entity GRPaymentStatus as projection on db.GRPaymentStatus;
     entity GRItemInspectStatus as projection on db.GRItemInspectStatus;

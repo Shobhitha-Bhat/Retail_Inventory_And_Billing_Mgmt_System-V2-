@@ -77,6 +77,11 @@ annotate service.IndependentDistributor with @(
             Action : 'DistributorService.triggerGRtoRetailer',
             Label : 'triggerGRtoRetailer',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : requestStatus_ID,
+            Label : 'requestStatus',
+        },
     ],
     UI.Facets : [
         {
@@ -160,4 +165,8 @@ annotate service.DistributorOrderItems with @(
         },
     ],
 );
+
+annotate service.IndependentDistributor with {
+    requestStatus @Common.ExternalID : requestStatus.reqStatus
+};
 

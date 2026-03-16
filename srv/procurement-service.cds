@@ -6,6 +6,7 @@ service ProcurementService {
     entity Items               as projection on db.Items;
     entity IndependentDistributor as projection on db.IndependentDistributor;
     entity DistributorOrderItems as projection on db.DistributorOrderItems;
+    entity RequestStatus as projection on db.RequestStatus;
 
     entity PO  as projection on db.PO 
         actions {
@@ -16,7 +17,7 @@ service ProcurementService {
         };
 
     entity POStatus as projection on db.POStatus;
-    entity POItems as projection on db.POItems {
+    entity POItems as projection on db.POItems as POI {
             *,
             @Core.Computed
             (
@@ -25,7 +26,7 @@ service ProcurementService {
                     (
                         select sum(g.quantityReceived - g.quantityDamaged) from db.GRItems as g
                         where
-                            g.poItem.ID = ID
+                            g.poItem.ID = POI.ID
                     ), 0
                 )
             ) as itemsYetToReceive : Integer
@@ -46,3 +47,14 @@ service ProcurementService {
     entity GRItemInspectStatus as projection on db.GRItemInspectStatus;
     entity GRPaymentStatus     as projection on db.GRPaymentStatus;
 }
+
+annotate ProcurementService.GRItems with @Common.SideEffects : {
+    TargetEntities : [ '$self' ] // This tells the UI to refresh the specific row/table
+} 
+actions {
+    markInspected @(
+        Common.SideEffects : {
+            TargetEntities : [ '$self' ]
+        }
+    )
+};
