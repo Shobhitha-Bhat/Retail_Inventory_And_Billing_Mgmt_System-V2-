@@ -100,8 +100,8 @@ module.exports = function () {
 
         const poitems = await SELECT.from(POItems).where({ parentPO_ID: ID })
 
-        const reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
-        if (!reStatus) return req.error(404, "Status 'Open' not found");
+        const reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Pending' });
+        if (!reStatus) return req.error(404, "Status 'Pending' not found");
 
         const itemsToInsert = [];
         let total = 0;

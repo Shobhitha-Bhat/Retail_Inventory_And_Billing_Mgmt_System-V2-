@@ -71,11 +71,6 @@ annotate service.GR with @(
 annotate service.GRItems with @(
     UI.LineItem #GRItems : [
         {
-            $Type : 'UI.DataFieldForAction',
-            Action : 'ProcurementService.markInspected',
-            Label : 'markInspected',
-        },
-        {
             $Type : 'UI.DataField',
             Value : ID,
             Label : 'ID',
@@ -109,6 +104,11 @@ annotate service.GRItems with @(
             $Type : 'UI.DataField',
             Value : inspectionStatus.inspectStatus,
             Label : 'inspectStatus',
+        },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'ProcurementService.markInspected',
+            Label : 'markInspected',
         },
     ],
     UI.Facets : [

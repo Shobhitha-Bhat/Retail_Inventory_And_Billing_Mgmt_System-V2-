@@ -2,7 +2,7 @@ const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports=function(){
 
-    const { IndependentDistributor, DistributorOrderItems,GRStatus,GRPaymentStatus,GRItemInspectStatus,GR } = this.entities;
+    const { IndependentDistributor, DistributorOrderItems,GRStatus,GRPaymentStatus,GRItemInspectStatus,GR,RequestStatus } = this.entities;
 
     this.after('READ', 'IndependentDistributor', async (data, req) => {
     const pos = Array.isArray(data) ? data : [data];
@@ -42,6 +42,7 @@ module.exports=function(){
         
         const triggeredPO= await SELECT.one.from(IndependentDistributor).where({ID:ID})
         if (!triggeredPO) return req.error(400, `No Distributor record found for ID: ${ID}`);
+
         const items = await SELECT.from(DistributorOrderItems).where({parentDistributor:ID})
 
         const itemsToInsert=[];
@@ -70,7 +71,9 @@ module.exports=function(){
             totalPOAmount:total,
         })
 
-
+        const reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
+        if (!reStatus) return req.error(404, "Status 'Open' not found");
+        await UPDATE(IndependentDistributor).set({requestStatus_ID:reStatus.ID}).where({ID:triggeredPO.ID})
 
         req.info("Requested Items sent. Confirm With the Retailer.")
     })
