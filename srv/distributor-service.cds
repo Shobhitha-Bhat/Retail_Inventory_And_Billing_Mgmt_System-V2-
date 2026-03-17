@@ -26,7 +26,7 @@ service DistributorService{
     entity MockDistributors as projection on db.MockDistributors;
     entity IndependentDistributor as projection on db.IndependentDistributor
     actions{
-        action triggerGRtoRetailer();
+        action triggerGRtoRetailer() returns IndependentDistributor;
     }
     entity DistributorOrderItems as projection on db.DistributorOrderItems as DOI{
             *,

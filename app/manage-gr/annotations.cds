@@ -65,6 +65,11 @@ annotate service.GR with @(
             Value : totalPOAmount,
             Label : 'totalPOAmount',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : currentOrderAmount,
+            Label : 'currentOrderAmount',
+        },
     ],
 );
 

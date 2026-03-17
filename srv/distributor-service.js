@@ -1,3 +1,4 @@
+
 const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports=function(){
@@ -31,6 +32,17 @@ module.exports=function(){
         //in grItems status is pending for inspection status
 
         const { ID } = req.params[1];
+
+        let reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Closed' });
+        if (!reStatus) return req.error(404, "Status 'Closed' not found");
+
+        const triggeredPO= await SELECT.one.from(IndependentDistributor).where({ID:ID})
+        if (!triggeredPO) return req.error(400, `Cant find Requested Row`);
+        if(triggeredPO.requestStatus_ID == reStatus.ID){
+            return req.error(404,"Status Already Closed")
+        }
+
+    
         const grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'StockRcvd_InspectionInProgress' });
         if (!grStatusRecord) return req.error(404, "Status 'StockRcvd_InspectionInProgress' not found");
 
@@ -40,28 +52,39 @@ module.exports=function(){
         const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Pending' });
         if (!grItemInspectStatus) return req.error(404, "Status 'Pending' not found");
         
-        const triggeredPO= await SELECT.one.from(IndependentDistributor).where({ID:ID})
-        if (!triggeredPO) return req.error(400, `No Distributor record found for ID: ${ID}`);
 
         const items = await SELECT.from(DistributorOrderItems).where({parentDistributor:ID})
 
         const itemsToInsert=[];
         let total=0;
+        let currentOrderAmount = 0
         for(const item of items){
             const price = Number(item.itemBasePrice) || 0;
                 const gst = Number(item.gstPercent) || 0;
+                const qtyToSend = Number(item.itemsYetToSend)||0;
                 const qty = Number(item.quantity) || 0;
 
                 const eachItemPriceWithQuantity = (price * qty) + ((price * qty * gst) / 100);
                 total += eachItemPriceWithQuantity;
-            itemsToInsert.push({
-                // parentGR automatically mapped when deep inserted
-                poItem_ID: item.refPOItemID,
-                quantityReceived:item.quantity,
-                inspectionStatus_ID:grItemInspectStatus.ID,
-                
-            })
+
+                if(qtyToSend>0){
+                        currentOrderAmount += (qtyToSend * eachItemPriceWithQuantity);
+                    itemsToInsert.push({
+                    // parentGR automatically mapped when deep inserted
+                    poItem_ID: item.refPOItemID,
+                    quantityReceived:qtyToSend,
+                    inspectionStatus_ID:grItemInspectStatus.ID,
+                    
+                })
+                }
         }
+        
+        if (itemsToInsert.length === 0) {
+                    
+                    await UPDATE(IndependentDistributor).set({requestStatus_ID:reStatus.ID}).where({ID:ID})
+                req.info("All items for this PO have already been sent.");
+                return SELECT.one.from(IndependentDistributor).where({ID:ID})
+            }
         
         await INSERT.into(GR).entries({
             originalPO_ID:triggeredPO.poID,
@@ -69,15 +92,18 @@ module.exports=function(){
             paymentStatus_ID:grPaymentStatus.ID,
             grItems:itemsToInsert,
             totalPOAmount:total,
+            currentOrderAmount: Number(currentOrderAmount.toFixed(2))
         })
 
-        const reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
+         reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
         if (!reStatus) return req.error(404, "Status 'Open' not found");
         await UPDATE(IndependentDistributor).set({requestStatus_ID:reStatus.ID}).where({ID:triggeredPO.ID})
 
         req.info("Requested Items sent. Confirm With the Retailer.")
+        return SELECT.one.from(IndependentDistributor).where({ID:ID})
     })
 }
+
 
 
 // this.on('approvePO', async (req) => {

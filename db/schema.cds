@@ -129,6 +129,7 @@ entity GR : cuid, managed {
     // totalAmount  : Decimal(15,2);   // actual payable amount
     // amountPaid   : Decimal(15,2);
     totalPOAmount : Decimal(15, 2) ;
+    currentOrderAmount : Decimal(15,2);
     virtual paidAmount: Decimal(15,2) ;
     virtual remainingAmount: Decimal(15,2) ;
 }
@@ -146,7 +147,7 @@ entity GRItems : cuid, managed {
     poItem           : Association to POItems;
     // items            : Association to Items;
     quantityReceived : Integer;
-    quantityDamaged  : Integer default 0;
+    quantityDamaged  : Integer;
     // inspectionStatus : String enum {
     //     Pending;
     //     Inspected;

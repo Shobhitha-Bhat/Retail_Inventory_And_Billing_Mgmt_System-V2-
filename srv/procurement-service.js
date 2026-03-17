@@ -2,7 +2,7 @@ const INSERT = require("@sap/cds/lib/ql/INSERT");
 const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports = function () {
-    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GRItems, GRItemInspectStatus,RequestStatus } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GRItems, GRItemInspectStatus, RequestStatus } = this.entities;
     this.on('DELETE', 'PO', async (req) => {
         req.reject(400, 'PO cant be deleted. Close PO instead. ')
     })
@@ -81,9 +81,9 @@ module.exports = function () {
                         remaining += (item.itemsYetToReceive * unitItemprice);
                     }
                 }
-                po.totalPOAmount = total || 0;
-                po.remainingAmount = remaining || 0;
-                po.paidAmount = total - remaining || 0;
+                po.totalPOAmount = Number(total.toFixed(2)) || 0;
+                po.remainingAmount = Number(remaining.toFixed(2)) || 0;
+                po.paidAmount = Number((total - remaining).toFixed(2)) || 0;
             }
         }
     })
@@ -128,7 +128,7 @@ module.exports = function () {
         await INSERT.into(IndependentDistributor).entries({
             poID: ID,
             toDistributor_ID: po.supplier_ID,
-            requestStatus_ID:reStatus.ID,
+            requestStatus_ID: reStatus.ID,
             orderItems: itemsToInsert // This matches the 'Composition of many' relationship name
         });
 
@@ -155,7 +155,7 @@ module.exports = function () {
         }
         await UPDATE(GRItems).set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged }).where({ ID: ID });
         req.info("Item Inspected")
-        return await SELECT.one.from(GRItems).where({ ID: ID })
+        return SELECT.one.from(GRItems).where({ ID: ID })
     })
 
     this.on('approveGR', async (req) => {
