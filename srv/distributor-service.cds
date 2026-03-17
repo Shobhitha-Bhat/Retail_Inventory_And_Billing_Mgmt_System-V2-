@@ -28,31 +28,32 @@ service DistributorService{
     actions{
         action triggerGRtoRetailer() returns IndependentDistributor;
     }
-    entity DistributorOrderItems as projection on db.DistributorOrderItems as DOI{
-            *,
-            // @Core.Computed
-            // (
-            //     quantity - coalesce(
-            //         //coalesce(a,b) if either of them is NULL the other is returned
-            //         (
-            //             select sum(g.quantityReceived - g.quantityDamaged) from db.GRItems as g
-            //             where
-            //                 g.poItem.ID = DOI.refPOItemID
-            //         ), 0
-            //     )
-            // ) as itemsYetToSend : Integer
-            @Core.Computed
-    (
-        coalesce(
-            (
-                select sum(g.quantityDamaged)
-                from db.GRItems as g
-                where g.poItem.ID = DOI.refPOItemID
-            ), 
-            DOI.quantity // Fallback: if no GR items exist yet, show full quantity
-        )
-    ) as itemsYetToSend : Integer
-        }
+    entity DistributorOrderItems as projection on db.DistributorOrderItems as DOI;
+    // {
+    //         *,
+    //         // @Core.Computed
+    //         // (
+    //         //     quantity - coalesce(
+    //         //         //coalesce(a,b) if either of them is NULL the other is returned
+    //         //         (
+    //         //             select sum(g.quantityReceived - g.quantityDamaged) from db.GRItems as g
+    //         //             where
+    //         //                 g.poItem.ID = DOI.refPOItemID
+    //         //         ), 0
+    //         //     )
+    //         // ) as itemsYetToSend : Integer
+    //         @Core.Computed
+    // (
+    //     coalesce(
+    //         (
+    //             select sum(g.quantityDamaged)
+    //             from db.GRItems as g
+    //             where g.poItem.ID = DOI.refPOItemID
+    //         ), 
+    //         DOI.quantity // Fallback: if no GR items exist yet, show full quantity
+    //     )
+    // ) as itemsYetToSend : Integer
+    //     }
     entity RequestStatus as projection on db.RequestStatus;
     entity GRStatus as projection on db.GRStatus;
     entity GRPaymentStatus as projection on db.GRPaymentStatus;

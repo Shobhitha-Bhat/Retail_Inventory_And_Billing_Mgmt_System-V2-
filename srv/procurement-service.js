@@ -2,7 +2,7 @@ const INSERT = require("@sap/cds/lib/ql/INSERT");
 const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports = function () {
-    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GRItems, GRItemInspectStatus, RequestStatus } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GR,GRItems, GRItemInspectStatus, RequestStatus } = this.entities;
     this.on('DELETE', 'PO', async (req) => {
         req.reject(400, 'PO cant be deleted. Close PO instead. ')
     })
@@ -120,7 +120,8 @@ module.exports = function () {
                     itemName: masterItem.itemName,
                     quantity: qty,
                     itemBasePrice: price,
-                    gstPercent: gst
+                    gstPercent: gst,
+                    itemsYetToSend:qty
                     // parentDistributor_ID is handled automatically by CAP in Deep Insert
                 });
             }
@@ -142,21 +143,83 @@ module.exports = function () {
         return SELECT.one.from(PO).where({ ID: ID });
     })
 
+    // this.on('markInspected', async (req) => {
+    //     //change status to inspected for the grItems.
+    //     //manually enter the quantity damaged if any. if no, enter 0;
+    //     const { quantityDamaged } = req.data
+    //     const { ID } = req.params[1]
+    //     const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
+    //     if (!grItemInspectStatus) return req.error(404, "Status 'Inspected' not found");
+    //     const gritem = await SELECT.one.from(GRItems).where({ ID: ID })
+    //     if (quantityDamaged > gritem.quantityReceived) {
+    //         return req.error(400, "Quantity damaged cant be greater than quantity received")
+    //     }
+    //     if (quantityDamaged > 0) {
+    //         const distOrder = await SELECT.one.from(IndependentDistributor)
+    //         .where({ poID: gritem.parentGR.originalPO_ID });
+
+    //     if (distOrder) {
+    //         await UPDATE(DistributorOrderItems)
+    //             .set({ itemsYetToSend: { '+=': quantityDamaged } })
+    //             .where({ 
+    //                 refPOItemID: gritem.poItem_ID, 
+    //                 parentDistributor_ID: distOrder.ID // This locks it to the correct PO!
+    //             });
+
+    //         // 4. Move status back to 'Open' so the distributor sees it again
+    //         const openStat = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
+    //         await UPDATE(IndependentDistributor)
+    //             .set({ requestStatus_ID: openStat.ID })
+    //             .where({ ID: distOrder.ID });
+    //         }
+    //     }
+    //     await UPDATE(GRItems).set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged }).where({ ID: ID });
+    //     req.info("Item Inspected")
+    //     return SELECT.one.from(GRItems).where({ ID: ID })
+    // })
+
     this.on('markInspected', async (req) => {
-        //change status to inspected for the grItems.
-        //manually enter the quantity damaged if any. if no, enter 0;
-        const { quantityDamaged } = req.data
-        const { ID } = req.params[1]
-        const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
-        if (!grItemInspectStatus) return req.error(404, "Status 'Inspected' not found");
-        const gritem = await SELECT.one.from(GRItems).where({ ID: ID })
-        if (quantityDamaged > gritem.quantityReceived) {
-            return req.error(400, "Quantity damaged cant be greater than quantity received")
+    const { quantityDamaged } = req.data;
+    const { ID } = req.params[1]; // GRItem ID
+    
+    const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
+
+    const gritem = await SELECT.one.from(GRItems).where({ ID: ID });
+    if(gritem.inspectionStatus_ID === grItemInspectStatus.ID ){
+        return req.error(400,"Item ALready Inspected")
+    }
+if(quantityDamaged > gritem.quantityReceived){
+    return req.error(400,"Quantity Damaged cant be > Quantity Received")
+}
+    if (!gritem) return req.error(404, "GR Item not found");
+    if (!gritem.parentGR_ID) return req.error(400, "GR Item is missing its parent GR reference");
+
+    const parentGR = await SELECT.one.from(GR).where({ ID: gritem.parentGR_ID });
+    if (!parentGR || !parentGR.originalPO_ID) {
+        return req.error(400, "Could not find the original PO linked to this GR");
+    }
+
+    if (quantityDamaged > 0) {
+        const distOrder = await SELECT.one.from(IndependentDistributor)
+            .where({ poID: parentGR.originalPO_ID });
+
+        if (distOrder) {
+            await UPDATE(DistributorOrderItems)
+                .set({ itemsYetToSend: { '+=': quantityDamaged } })
+                .where({ 
+                    refPOItemID: gritem.poItem_ID, 
+                    parentDistributor_ID: distOrder.ID 
+                });
         }
-        await UPDATE(GRItems).set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged }).where({ ID: ID });
-        req.info("Item Inspected")
-        return SELECT.one.from(GRItems).where({ ID: ID })
-    })
+    }
+
+    await UPDATE(GRItems)
+        .set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged })
+        .where({ ID: ID });
+
+    req.info("Item Inspected");
+    return SELECT.one.from(GRItems).where({ ID: ID });
+});
 
     this.on('approveGR', async (req) => {
         //when this button clicked,

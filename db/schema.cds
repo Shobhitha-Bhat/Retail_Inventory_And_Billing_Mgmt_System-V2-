@@ -285,6 +285,7 @@ entity DistributorOrderItems:cuid,managed{
     refPOItemID:UUID;
     itemName   : String;
     quantity   : Integer;
+    itemsYetToSend : Integer;
     itemBasePrice:Decimal(10, 2);
     gstPercent    : Decimal(5, 2);
     totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));

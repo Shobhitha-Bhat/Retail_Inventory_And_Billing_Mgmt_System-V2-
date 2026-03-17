@@ -64,11 +64,12 @@ module.exports=function(){
                 const qtyToSend = Number(item.itemsYetToSend)||0;
                 const qty = Number(item.quantity) || 0;
 
+                const unitPriceWithTax = price + (price * gst / 100);
                 const eachItemPriceWithQuantity = (price * qty) + ((price * qty * gst) / 100);
                 total += eachItemPriceWithQuantity;
 
                 if(qtyToSend>0){
-                        currentOrderAmount += (qtyToSend * eachItemPriceWithQuantity);
+                        currentOrderAmount += (qtyToSend * unitPriceWithTax);
                     itemsToInsert.push({
                     // parentGR automatically mapped when deep inserted
                     poItem_ID: item.refPOItemID,
@@ -94,8 +95,17 @@ module.exports=function(){
             totalPOAmount:total,
             currentOrderAmount: Number(currentOrderAmount.toFixed(2))
         })
+        
+        for (const item of itemsToInsert) {
+    await UPDATE(DistributorOrderItems)
+        .set({ itemsYetToSend: 0 })
+        .where({ 
+            parentDistributor_ID: ID, 
+            refPOItemID: item.poItem_ID 
+        });
+}
 
-         reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
+        reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Open' });
         if (!reStatus) return req.error(404, "Status 'Open' not found");
         await UPDATE(IndependentDistributor).set({requestStatus_ID:reStatus.ID}).where({ID:triggeredPO.ID})
 
