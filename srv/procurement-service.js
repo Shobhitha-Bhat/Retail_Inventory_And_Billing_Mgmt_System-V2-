@@ -251,22 +251,25 @@ module.exports = function () {
         for (const gritem of selectedGR.grItems) {
             if (gritem.quantityDamaged !== 0) {
                 if (gritem.quantityDamaged === gritem.quantityReceived) {
-
                     grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Returned' });
                     if (!grStatusRecord) return req.error(404, "Status 'Returned' not found");
 
                     grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Pending' });
                     if (!grPaymentStatus) return req.error(404, "Status 'Pending' not found");
+                    await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
+                    req.info("GR Appropriately Approved")
+                    return SELECT.one.from(GR).where({ ID: ID });
                 } else {
                     grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Partial Return' });
                     if (!grStatusRecord) return req.error(404, "Status 'Partial Return' not found");
 
                     grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Partially Paid' });
                     if (!grPaymentStatus) return req.error(404, "Status 'Partially Paid' not found");
-
                 }
+
                 await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
                 req.info("GR Appropriately Approved")
+                addToInventory(gritem);
                 return SELECT.one.from(GR).where({ ID: ID });
             }
         }
@@ -276,9 +279,19 @@ module.exports = function () {
 
         grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Paid' });
         if (!grPaymentStatus) return req.error(404, "Status 'Paid' not found");
-        
+
         await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
         req.info("GR Approved")
         return SELECT.one.from(GR).where({ ID: ID });
+    })
+}
+
+async function addToInventory(gritem){
+    //fetch gritem row -> required poItem:assoc to POItems
+    //using that fetch POItems => required poItem:assoc to Items
+    //this poItem_ID is attached to inventoryItem_ID (inventoryItem_ID:assoc to Items) 
+
+    await INSERT.into(Inventory).entries({
+        quantity:{'+=':gritem.quantityReceived}
     })
 }
