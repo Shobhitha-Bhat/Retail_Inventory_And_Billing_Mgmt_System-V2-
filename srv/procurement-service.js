@@ -2,7 +2,7 @@ const INSERT = require("@sap/cds/lib/ql/INSERT");
 const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports = function () {
-    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GR,GRItems, GRItemInspectStatus, RequestStatus } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GR, GRItems, GRItemInspectStatus, GRStatus, GRPaymentStatus, RequestStatus } = this.entities;
     this.on('DELETE', 'PO', async (req) => {
         req.reject(400, 'PO cant be deleted. Close PO instead. ')
     })
@@ -106,7 +106,7 @@ module.exports = function () {
         const itemsToInsert = [];
         let total = 0;
         for (const item of poitems) {
-            // Fetch item master data for details
+
             const masterItem = await SELECT.one.from(Items).where({ ID: item.poItem_ID });
             if (masterItem) {
                 const price = Number(masterItem.itemBasePrice) || 0;
@@ -121,7 +121,7 @@ module.exports = function () {
                     quantity: qty,
                     itemBasePrice: price,
                     gstPercent: gst,
-                    itemsYetToSend:qty
+                    itemsYetToSend: qty
                     // parentDistributor_ID is handled automatically by CAP in Deep Insert
                 });
             }
@@ -130,7 +130,7 @@ module.exports = function () {
             poID: ID,
             toDistributor_ID: po.supplier_ID,
             requestStatus_ID: reStatus.ID,
-            orderItems: itemsToInsert // This matches the 'Composition of many' relationship name
+            orderItems: itemsToInsert
         });
 
         //set status to Open after Approval
@@ -179,47 +179,47 @@ module.exports = function () {
     // })
 
     this.on('markInspected', async (req) => {
-    const { quantityDamaged } = req.data;
-    const { ID } = req.params[1]; // GRItem ID
-    
-    const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
+        const { quantityDamaged } = req.data;
+        const { ID } = req.params[1]; // GRItem ID
 
-    const gritem = await SELECT.one.from(GRItems).where({ ID: ID });
-    if(gritem.inspectionStatus_ID === grItemInspectStatus.ID ){
-        return req.error(400,"Item ALready Inspected")
-    }
-if(quantityDamaged > gritem.quantityReceived){
-    return req.error(400,"Quantity Damaged cant be > Quantity Received")
-}
-    if (!gritem) return req.error(404, "GR Item not found");
-    if (!gritem.parentGR_ID) return req.error(400, "GR Item is missing its parent GR reference");
+        const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
 
-    const parentGR = await SELECT.one.from(GR).where({ ID: gritem.parentGR_ID });
-    if (!parentGR || !parentGR.originalPO_ID) {
-        return req.error(400, "Could not find the original PO linked to this GR");
-    }
-
-    if (quantityDamaged > 0) {
-        const distOrder = await SELECT.one.from(IndependentDistributor)
-            .where({ poID: parentGR.originalPO_ID });
-
-        if (distOrder) {
-            await UPDATE(DistributorOrderItems)
-                .set({ itemsYetToSend: { '+=': quantityDamaged } })
-                .where({ 
-                    refPOItemID: gritem.poItem_ID, 
-                    parentDistributor_ID: distOrder.ID 
-                });
+        const gritem = await SELECT.one.from(GRItems).where({ ID: ID });
+        if (gritem.inspectionStatus_ID === grItemInspectStatus.ID) {
+            return req.error(400, "Item ALready Inspected")
         }
-    }
+        if (quantityDamaged > gritem.quantityReceived) {
+            return req.error(400, "Quantity Damaged cant be > Quantity Received")
+        }
+        if (!gritem) return req.error(404, "GR Item not found");
+        if (!gritem.parentGR_ID) return req.error(400, "GR Item is missing its parent GR reference");
 
-    await UPDATE(GRItems)
-        .set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged })
-        .where({ ID: ID });
+        const parentGR = await SELECT.one.from(GR).where({ ID: gritem.parentGR_ID });
+        if (!parentGR || !parentGR.originalPO_ID) {
+            return req.error(400, "Could not find the original PO linked to this GR");
+        }
 
-    req.info("Item Inspected");
-    return SELECT.one.from(GRItems).where({ ID: ID });
-});
+        if (quantityDamaged > 0) {
+            const distOrder = await SELECT.one.from(IndependentDistributor)
+                .where({ poID: parentGR.originalPO_ID });
+
+            if (distOrder) {
+                await UPDATE(DistributorOrderItems)
+                    .set({ itemsYetToSend: { '+=': quantityDamaged } })
+                    .where({
+                        refPOItemID: gritem.poItem_ID,
+                        parentDistributor_ID: distOrder.ID
+                    });
+            }
+        }
+
+        await UPDATE(GRItems)
+            .set({ inspectionStatus_ID: grItemInspectStatus.ID, quantityDamaged: quantityDamaged })
+            .where({ ID: ID });
+
+        req.info("Item Inspected");
+        return SELECT.one.from(GRItems).where({ ID: ID });
+    });
 
     this.on('approveGR', async (req) => {
         //when this button clicked,
@@ -234,5 +234,51 @@ if(quantityDamaged > gritem.quantityReceived){
         ////update inventory with the good stocks = totalquantity-damaged
         //-------------> (loop) same as previous //once distributor triggers it...they change state to StockRcvd_inspection_pending
 
+        const { ID } = req.params[0]; //id of GR
+        const selectedGR = await SELECT.one.from(GR)
+            .where({ ID: ID })
+            .columns(g => {
+                g('*'), // Get all fields from GR
+                    g.grItems('*') // Expand and get all fields from items
+            });
+
+        if (!selectedGR) return req.error(404, "GR not found");
+        if (!selectedGR.grItems) return req.error(400, "This GR has no items to approve");
+
+        let grStatusRecord;
+        let grPaymentStatus;
+
+        for (const gritem of selectedGR.grItems) {
+            if (gritem.quantityDamaged !== 0) {
+                if (gritem.quantityDamaged === gritem.quantityReceived) {
+
+                    grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Returned' });
+                    if (!grStatusRecord) return req.error(404, "Status 'Returned' not found");
+
+                    grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Pending' });
+                    if (!grPaymentStatus) return req.error(404, "Status 'Pending' not found");
+                } else {
+                    grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Partial Return' });
+                    if (!grStatusRecord) return req.error(404, "Status 'Partial Return' not found");
+
+                    grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Partially Paid' });
+                    if (!grPaymentStatus) return req.error(404, "Status 'Partially Paid' not found");
+
+                }
+                await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
+                req.info("GR Appropriately Approved")
+                return SELECT.one.from(GR).where({ ID: ID });
+            }
+        }
+        //if 0 damagaed
+        grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Accepted' });
+        if (!grStatusRecord) return req.error(404, "Status 'Accepted' not found");
+
+        grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Paid' });
+        if (!grPaymentStatus) return req.error(404, "Status 'Paid' not found");
+        
+        await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
+        req.info("GR Approved")
+        return SELECT.one.from(GR).where({ ID: ID });
     })
 }

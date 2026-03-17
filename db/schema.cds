@@ -130,8 +130,8 @@ entity GR : cuid, managed {
     // amountPaid   : Decimal(15,2);
     totalPOAmount : Decimal(15, 2) ;
     currentOrderAmount : Decimal(15,2);
-    virtual paidAmount: Decimal(15,2) ;
-    virtual remainingAmount: Decimal(15,2) ;
+    // virtual paidAmount: Decimal(15,2) ;
+    // virtual remainingAmount: Decimal(15,2) ;
 }
 
 entity GRPaymentStatus:cuid{
