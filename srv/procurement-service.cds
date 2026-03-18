@@ -19,20 +19,7 @@ service ProcurementService {
         };
 
     entity POStatus as projection on db.POStatus;
-    entity POItems as projection on db.POItems as POI {
-            *,
-            @Core.Computed
-            (
-                quantity - coalesce(
-                    //coalesce(a,b) if either of them is NULL the other is returned
-                    (
-                        select sum(g.quantityReceived - g.quantityDamaged) from db.GRItems as g
-                        where
-                            g.poItem.ID = POI.ID
-                    ), 0
-                )
-            ) as itemsYetToReceive : Integer
-        }
+    entity POItems as projection on db.POItems as POI;
 
 
     entity GR as projection on db.GR

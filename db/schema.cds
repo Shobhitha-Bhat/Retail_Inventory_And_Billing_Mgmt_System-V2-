@@ -102,6 +102,7 @@ entity POItems : cuid, managed {
     parentPO   : Association to PO;
     poItem      : Association to Items;
     quantity   : Integer;
+    itemsYetToReceive : Integer
 
     //Based on Mutual Agreement with the Distributor.
     //for transactional data snapshot to keep previous data

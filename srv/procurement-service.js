@@ -105,7 +105,7 @@ module.exports = function () {
         if (!reStatus) return req.error(404, "Status 'Pending' not found");
 
         const itemsToInsert = [];
-        let total = 0;
+        let total = 0,quantityToAdd;
         for (const item of poitems) {
 
             const masterItem = await SELECT.one.from(Items).where({ ID: item.poItem_ID });
@@ -113,7 +113,7 @@ module.exports = function () {
                 const price = Number(masterItem.itemBasePrice) || 0;
                 const gst = Number(masterItem.gstPercent) || 0;
                 const qty = Number(item.quantity) || 0;
-
+                quantityToAdd = Number(item.quantity) || 0;
                 const eachItemPriceWithQuantity = (price * qty) + ((price * qty * gst) / 100);
                 total += eachItemPriceWithQuantity;
                 itemsToInsert.push({
@@ -133,6 +133,10 @@ module.exports = function () {
             requestStatus_ID: reStatus.ID,
             orderItems: itemsToInsert
         });
+
+        await UPDATE(POItems)
+            .set({ itemsYetToReceive: quantityToAdd }) // Set it equal to the initial ordered quantity
+            .where({ parentPO_ID: ID });
 
         //set status to Open after Approval
         statusRecord = await SELECT.one.from(POStatus).where({ poStatus: 'Open' });
@@ -252,34 +256,41 @@ module.exports = function () {
 
         let grStatusRecord, grPaymentStatus, poStatusRecord, status = 'Accepted', payment = 'Paid', postatus = 'Closed';
 
+        const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
+        if(!grItemInspectStatus) return req.error(404,`Status ${grItemInspectStatus} not found`)
+
         for (const gritem of selectedGR.grItems) {
+            if(gritem.inspectionStatus_ID !== grItemInspectStatus.ID ){
+                return req.error(400,'Item Remaining to Be Inspected. Inspect all Before Approving.')
+            }
             if (gritem.quantityDamaged !== 0) {
                 if (gritem.quantityDamaged === gritem.quantityReceived) {
-                    
+
                     status = 'Returned'; payment = 'Pending', postatus = 'Open';
                 } else {
-                    
+
                     status = 'Partial Return'; payment = 'Partially Paid', postatus = 'Partial';
-                    
+
                 }
 
-                
+
             }
-            
+
             grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: status });
             if (!grStatusRecord) return req.error(404, `Status ${status} not found`);
             grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: payment });
             if (!grPaymentStatus) return req.error(404, `Status ${payment} not found`);
-            poStatusRecord = await SELECT.one.from(POStatus).where({poStatus:postatus})
-            if(!poStatusRecord) return req.error(404,`Status ${postatus} not found`)
-                
+            poStatusRecord = await SELECT.one.from(POStatus).where({ poStatus: postatus })
+            if (!poStatusRecord) return req.error(404, `Status ${postatus} not found`)
+
             await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
-            await UPDATE(PO).set({status_ID:poStatusRecord.ID}).where({ID:selectedGR.originalPO_ID})
+            await UPDATE(PO).set({ status_ID: poStatusRecord.ID }).where({ ID: selectedGR.originalPO_ID })
+            await UPDATE(POItems).set({ itemsYetToReceive:{'-=': gritem.quantityReceived - gritem.quantityDamaged}  }).where({ ID: gritem.poItem_ID })
             await addToInventory(gritem, req);
 
 
         }
-        
+
 
         req.info("GR Appropriately Approved")
         req.info("Items Stocked")
