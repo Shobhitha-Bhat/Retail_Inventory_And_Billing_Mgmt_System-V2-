@@ -255,34 +255,17 @@ module.exports = function () {
         for (const gritem of selectedGR.grItems) {
             if (gritem.quantityDamaged !== 0) {
                 if (gritem.quantityDamaged === gritem.quantityReceived) {
-                    // grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Returned' });
-                    // if (!grStatusRecord) return req.error(404, "Status 'Returned' not found");
-
-                    // grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Pending' });
-                    // if (!grPaymentStatus) return req.error(404, "Status 'Pending' not found");
-                    // await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
-                    // req.info("GR Appropriately Approved")
-                    // return SELECT.one.from(GR).where({ ID: ID });
+                    
                     status = 'Returned'; payment = 'Pending', postatus = 'Open';
                 } else {
-                    // grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Partial Return' });
-                    // if (!grStatusRecord) return req.error(404, "Status 'Partial Return' not found");
-
-                    // grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Partially Paid' });
-                    // if (!grPaymentStatus) return req.error(404, "Status 'Partially Paid' not found");
+                    
                     status = 'Partial Return'; payment = 'Partially Paid', postatus = 'Partial';
-                    // await addToInventory(gritem,req);
+                    
                 }
 
-                // grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: status });
-                // if (!grStatusRecord) return req.error(404, `Status ${status} not found`);
-                // grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: payment });
-                // if (!grPaymentStatus) return req.error(404, `Status ${payment} not found`);
-                // await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
-                // req.info("GR Appropriately Approved")
-                // return SELECT.one.from(GR).where({ ID: ID });
+                
             }
-            // await addToInventory(gritem,req);
+            
             grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: status });
             if (!grStatusRecord) return req.error(404, `Status ${status} not found`);
             grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: payment });
@@ -296,18 +279,7 @@ module.exports = function () {
 
 
         }
-        //if 0 damagaed
-        // grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'Accepted' });
-        // if (!grStatusRecord) return req.error(404, "Status 'Accepted' not found");
-
-        // grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Paid' });
-        // if (!grPaymentStatus) return req.error(404, "Status 'Paid' not found");
-        // grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: status });
-        // if (!grStatusRecord) return req.error(404, `Status ${status} not found`);
-        // grPaymentStatus = await SELECT.one.from(GRPaymentStatus).where({ grPayStatus: payment });
-        // if (!grPaymentStatus) return req.error(404, `Status ${payment} not found`);
-
-        // await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
+        
 
         req.info("GR Appropriately Approved")
         req.info("Items Stocked")
