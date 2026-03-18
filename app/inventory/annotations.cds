@@ -5,21 +5,6 @@ annotate service.Inventory with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'quantity',
-                Value : quantity,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'costPrice',
-                Value : costPrice,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'status',
-                Value : status,
-            },
-            {
-                $Type : 'UI.DataField',
                 Value : inventoryItem.ID,
                 Label : 'itemID',
             },
@@ -30,6 +15,16 @@ annotate service.Inventory with @(
             },
             {
                 $Type : 'UI.DataField',
+                Label : 'quantity',
+                Value : quantity,
+            },
+            {
+                $Type : 'UI.DataField',
+                Label : 'costPrice',
+                Value : costPrice,
+            },
+            {
+                $Type : 'UI.DataField',
                 Value : inventoryItem.gstPercent,
                 Label : 'gstPercent',
             },
@@ -37,16 +32,6 @@ annotate service.Inventory with @(
                 $Type : 'UI.DataField',
                 Value : inventoryItem.marginPercent,
                 Label : 'marginPercent',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : inventoryItem.category_ID,
-                Label : 'category_ID',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : inventoryItem.status,
-                Label : 'status',
             },
         ],
     },
@@ -81,8 +66,8 @@ annotate service.Inventory with @(
         },
         {
             $Type : 'UI.DataField',
-            Label : 'status',
-            Value : status,
+            Value : status_ID,
+            Label : 'status_ID',
         },
     ],
 );
@@ -115,5 +100,9 @@ annotate service.Inventory with {
             },
         ],
     }
+};
+
+annotate service.Inventory with {
+    status @Common.ExternalID : status.invStatus
 };
 

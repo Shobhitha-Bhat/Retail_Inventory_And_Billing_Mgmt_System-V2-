@@ -7,6 +7,8 @@ service ProcurementService {
     entity IndependentDistributor as projection on db.IndependentDistributor;
     entity DistributorOrderItems as projection on db.DistributorOrderItems;
     entity RequestStatus as projection on db.RequestStatus;
+    entity InventoryStatus as projection on db.InventoryStatus;
+    entity Inventory as projection on db.Inventory;
 
     entity PO  as projection on db.PO 
         actions {

@@ -207,8 +207,6 @@ entity SalesReturnStatus:cuid{
 }
 
 
-
-
 entity SalesItems : cuid, managed {
     parentSales   : Association to Sales;
     item          : Association to Items;
