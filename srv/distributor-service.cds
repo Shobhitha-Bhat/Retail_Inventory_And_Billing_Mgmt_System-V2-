@@ -27,6 +27,7 @@ service DistributorService{
     entity IndependentDistributor as projection on db.IndependentDistributor
     actions{
         action triggerGRtoRetailer() returns IndependentDistributor;
+        action closeRequest() returns IndependentDistributor;
     }
     entity DistributorOrderItems as projection on db.DistributorOrderItems as DOI;
     // {

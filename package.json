@@ -15,7 +15,9 @@
     "watch-inventory": "cds watch --open inventory/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-passbook": "cds watch --open passbook/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-sales": "cds watch --open sales/index.html?sap-ui-xx-viewCache=false --livereload false",
-    "watch-distributor-access-portal": "cds watch --open distributoraccessportal/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-distributor-access-portal": "cds watch --open distributoraccessportal/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-overview": "cds watch --open overview/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-ledger": "cds watch --open ledger/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "cds": {
     "requires": {
@@ -57,6 +59,8 @@
     "app/sales",
     "app/distributor-portal",
     "app/distributor-portal",
-    "app/distributor-access-portal"
+    "app/distributor-access-portal",
+    "app/overview",
+    "app/ledger"
   ]
 }

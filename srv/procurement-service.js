@@ -3,7 +3,7 @@ const INSERT = require("@sap/cds/lib/ql/INSERT");
 const SELECT = require("@sap/cds/lib/ql/SELECT");
 
 module.exports = function () {
-    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GR, GRItems, GRItemInspectStatus, GRStatus, GRPaymentStatus, RequestStatus, InventoryStatus, Inventory } = this.entities;
+    const { Categories, CategoryStatus, Items, Distributors, PO, POItems, POStatus, ItemStatus, IndependentDistributor, DistributorOrderItems, GR, GRItems, GRItemInspectStatus, GRStatus, GRPaymentStatus, RequestStatus, InventoryStatus, Inventory, RetailLedger, PassbookEntryTypes, Departments } = this.entities;
     this.on('DELETE', 'PO', async (req) => {
         req.reject(400, 'PO cant be deleted. Close PO instead. ')
     })
@@ -105,7 +105,7 @@ module.exports = function () {
         if (!reStatus) return req.error(404, "Status 'Pending' not found");
 
         const itemsToInsert = [];
-        let total = 0,quantityToAdd;
+        let total = 0, quantityToAdd;
         for (const item of poitems) {
 
             const masterItem = await SELECT.one.from(Items).where({ ID: item.poItem_ID });
@@ -257,11 +257,11 @@ module.exports = function () {
         let grStatusRecord, grPaymentStatus, poStatusRecord, status = 'Accepted', payment = 'Paid', postatus = 'Closed';
 
         const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
-        if(!grItemInspectStatus) return req.error(404,`Status ${grItemInspectStatus} not found`)
+        if (!grItemInspectStatus) return req.error(404, `Status ${grItemInspectStatus} not found`)
 
         for (const gritem of selectedGR.grItems) {
-            if(gritem.inspectionStatus_ID !== grItemInspectStatus.ID ){
-                return req.error(400,'Item Remaining to Be Inspected. Inspect all Before Approving.')
+            if (gritem.inspectionStatus_ID !== grItemInspectStatus.ID) {
+                return req.error(400, 'Some Items are Remaining to Be Inspected. Inspect all Before Approving.')
             }
             if (gritem.quantityDamaged !== 0) {
                 if (gritem.quantityDamaged === gritem.quantityReceived) {
@@ -285,19 +285,18 @@ module.exports = function () {
 
             await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
             await UPDATE(PO).set({ status_ID: poStatusRecord.ID }).where({ ID: selectedGR.originalPO_ID })
-            await UPDATE(POItems).set({ itemsYetToReceive:{'-=': gritem.quantityReceived - gritem.quantityDamaged}  }).where({ ID: gritem.poItem_ID })
+            await UPDATE(POItems).set({ itemsYetToReceive: { '-=': gritem.quantityReceived - gritem.quantityDamaged } }).where({ ID: gritem.poItem_ID })
             await addToInventory(gritem, req);
+            await updateLedger(gritem, req);
 
 
         }
 
 
         req.info("GR Appropriately Approved")
-        req.info("Items Stocked")
+        req.info("Items Stocked | PO Statuses Updated | Ledger Updated")
         return SELECT.one.from(GR).where({ ID: ID });
     })
-
-
 
 
     async function addToInventory(gritem, req) {
@@ -339,5 +338,42 @@ module.exports = function () {
 
             })
         }
+    }
+
+
+    async function updateLedger(gritem, req) {
+        const poitem = await SELECT.one.from(POItems).where({ ID: gritem.poItem_ID })
+        if (!poitem) {
+            return req.error(404, "Requested POItem Not found")
+        }
+
+        const item = await SELECT.one.from(Items).where({ ID: poitem.poItem_ID })
+        if (!item) {
+            return req.error(404, "Requested Item not found")
+        }
+
+        let itemcostprice = (item.itemBasePrice + ((item.itemBasePrice * item.gstPercent) / 100));
+        
+        const deptRecord = await SELECT.one.from(Departments).where({ dept: 'PROCUREMENT' });
+        if (!deptRecord) return req.error(400, 'Invalid Department');
+        
+        const debitRecord = await SELECT.one.from(PassbookEntryTypes).where({ entryType: 'DEBIT' })
+        if (!debitRecord) return req.error(400, 'DEBIT not found')
+            
+            const lastEntry = await SELECT.one.from(RetailLedger)
+            .columns('currentBalance')
+            .orderBy('createdAt desc');
+            
+        const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        let newBalance = previousBalance - (itemcostprice*(gritem.quantityReceived - gritem.quantityDamaged));
+
+
+        await INSERT.into(RetailLedger).entries({
+            entryType_ID:debitRecord.ID,
+            department_ID:deptRecord.ID,
+            amount:itemcostprice*(gritem.quantityReceived - gritem.quantityDamaged),
+            currentBalance:newBalance
+        })
+
     }
 }

@@ -236,6 +236,7 @@ entity SalesReturnItems : cuid, managed {
 
 //FINANCE
 
+@odata.draft.enabled
 entity RetailLedger : cuid, managed {
     // entryType    : String enum {
     //     CREDIT; 
@@ -250,7 +251,7 @@ entity RetailLedger : cuid, managed {
     entryType:Association to PassbookEntryTypes;
     department:Association to Departments;
     amount       : Decimal(15, 2);
-    totalBalance : Decimal(15, 2); // Running balance 
+    currentBalance : Decimal(15, 2) @Core.Computed; // Running balance 
 }
 
 entity PassbookEntryTypes:cuid{

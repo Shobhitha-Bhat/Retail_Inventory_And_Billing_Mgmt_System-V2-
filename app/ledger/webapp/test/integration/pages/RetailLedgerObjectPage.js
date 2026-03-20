@@ -8,7 +8,7 @@ sap.ui.define(['sap/fe/test/ObjectPage'], function(ObjectPage) {
 
     return new ObjectPage(
         {
-            appId: 'passbook',
+            appId: 'ledger',
             componentId: 'RetailLedgerObjectPage',
             contextPath: '/RetailLedger'
         },

@@ -2,7 +2,7 @@
 
 specVersion: "4.0"
 metadata:
-  name: passbook
+  name: ledger
 type: application
 server:
   customMiddleware:

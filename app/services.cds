@@ -10,11 +10,10 @@ using from './manage-pos/annotations';
 using from './manage-gr/annotations';
 
 
-
-using from './passbook/annotations';
-
 using from './inventory/annotations';
 
 using from './sales/annotations';
 
 using from './distributor-access-portal/annotations';
+
+using from './ledger/annotations';

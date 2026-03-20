@@ -1,7 +1,7 @@
 {
-  "_version": "1.81.0",
+  "_version": "1.83.0",
   "sap.app": {
-    "id": "passbook",
+    "id": "ledger",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -12,16 +12,16 @@
     "resources": "resources.json",
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
-      "version": "1.20.2",
-      "toolsId": "d9fd62ee-bcee-486f-bc9b-6bbd11b820e4"
+      "version": "1.21.0",
+      "toolsId": "1be423e1-88e0-4312-a4a8-75e94bcb0d48"
     },
     "dataSources": {
       "mainService": {
-        "uri": "/odata/v4/financeservice/",
+        "uri": "/odata/v4/finance/",
         "type": "OData",
         "settings": {
           "annotations": [],
-          "odataVersion": "4.0"
+          "odataVersion": "4.01"
         }
       }
     }
@@ -45,7 +45,7 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.145.0",
+      "minUI5Version": "1.146.0",
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
@@ -60,7 +60,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "passbook.i18n.i18n"
+          "bundleName": "ledger.i18n.i18n"
         }
       },
       "": {
@@ -87,6 +87,11 @@
           "pattern": ":?query:",
           "name": "RetailLedgerList",
           "target": "RetailLedgerList"
+        },
+        {
+          "pattern": "RetailLedger({key}):?query:",
+          "name": "RetailLedgerObjectPage",
+          "target": "RetailLedgerObjectPage"
         }
       ],
       "targets": {
@@ -98,7 +103,13 @@
             "settings": {
               "contextPath": "/RetailLedger",
               "variantManagement": "Page",
-              "navigation": {},
+              "navigation": {
+                "RetailLedger": {
+                  "detail": {
+                    "route": "RetailLedgerObjectPage"
+                  }
+                }
+              },
               "controlConfiguration": {
                 "@com.sap.vocabularies.UI.v1.LineItem": {
                   "tableSettings": {
@@ -107,6 +118,17 @@
                 }
               },
               "initialLoad": "Enabled"
+            }
+          }
+        },
+        "RetailLedgerObjectPage": {
+          "type": "Component",
+          "id": "RetailLedgerObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "editableHeaderContent": false,
+              "contextPath": "/RetailLedger"
             }
           }
         }

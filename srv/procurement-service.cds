@@ -10,6 +10,10 @@ service ProcurementService {
     entity InventoryStatus as projection on db.InventoryStatus;
     entity Inventory as projection on db.Inventory;
 
+    entity RetailLedger as projection on db.RetailLedger;
+    entity PassbookEntryTypes as projection on db.PassbookEntryTypes;
+    entity Departments as projection on db.Departments;
+
     entity PO  as projection on db.PO 
         actions {
             // action approvePO() returns PO;
