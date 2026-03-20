@@ -256,6 +256,12 @@ module.exports = function () {
 
         let grStatusRecord, grPaymentStatus, poStatusRecord, status = 'Accepted', payment = 'Paid', postatus = 'Closed';
 
+        grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'StockRcvd_InspectionInProgress' });
+        if (!grStatusRecord) return req.error(404, `Status ${status} not found`);
+        if(selectedGR.status_ID !== grStatusRecord.ID ){
+            return req.error(400,'GR Already Inspected & Approved')
+        }
+
         const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
         if (!grItemInspectStatus) return req.error(404, `Status ${grItemInspectStatus} not found`)
 

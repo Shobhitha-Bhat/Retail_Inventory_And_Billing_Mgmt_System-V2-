@@ -112,7 +112,35 @@ module.exports=function(){
         req.info("Requested Items sent. Confirm With the Retailer.")
         return SELECT.one.from(IndependentDistributor).where({ID:ID})
     })
+
+
+
+    this.on('closeRequest',async(req)=>{
+        const { ID } = req.params[1];
+    
+            let reStatus = await SELECT.one.from(RequestStatus).where({ reqStatus: 'Closed' });
+            if (!reStatus) return req.error(404, "Status 'Closed' not found");
+    
+            const triggeredPO= await SELECT.one.from(IndependentDistributor).where({ID:ID})
+            if (!triggeredPO) return req.error(400, `Cant find Requested Row`);
+            if(triggeredPO.requestStatus_ID == reStatus.ID){
+                return req.error(404,"Status Already Closed")
+            }
+    
+            const items = await SELECT.from(DistributorOrderItems).where({parentDistributor:ID})
+            let canClose=true;
+            for(const item of items){
+                if(item.itemsYetToSend === 0)continue;
+                else canClose=false;
+            }
+    
+            if(canClose){
+                await UPDATE(IndependentDistributor).set({requestStatus_ID:reStatus.ID}).where({ID:triggeredPO.ID})
+                req.info("Request Closed")
+            }else{
+               req.error('Items Yet To Send. Cant Close Request')
+            }
+            return SELECT.one.from(IndependentDistributor).where({ID:ID})
+    })
 }
 
-
-this.on('closeRequest',)

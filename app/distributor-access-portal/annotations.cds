@@ -82,6 +82,11 @@ annotate service.IndependentDistributor with @(
             Value : requestStatus_ID,
             Label : 'requestStatus',
         },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'DistributorService.closeRequest',
+            Label : 'closeRequest',
+        },
     ],
     UI.Facets : [
         {
