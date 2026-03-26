@@ -94,15 +94,12 @@
         {
           "pattern": "Sales({key}):?query:",
           "name": "SalesObjectPage",
-          "target": [
-            "SalesList",
-            "SalesObjectPage"
-          ]
+          "target": "SalesObjectPage"
         },
         {
-          "name": "SalesReturnsObjectPage",
-          "pattern": "SalesReturns({SalesReturnsKey}):?query:",
-          "target": "SalesReturnsObjectPage"
+          "pattern": "Sales({key})/items({itemsKey}):?query:",
+          "name": "Sales_itemsObjectPage",
+          "target": "Sales_itemsObjectPage"
         }
       ],
       "targets": {
@@ -118,11 +115,6 @@
                 "Sales": {
                   "detail": {
                     "route": "SalesObjectPage"
-                  }
-                },
-                "SalesReturns": {
-                  "detail": {
-                    "route": "SalesReturnsObjectPage"
                   }
                 }
               },
@@ -142,20 +134,8 @@
                   }
                 }
               },
-              "initialLoad": "Enabled",
-              "views": {
-                "paths": [
-                  {
-                    "key": "tableView",
-                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
-                  },
-                  {
-                    "key": "tableView1",
-                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
-                    "entitySet": "SalesReturns"
-                  }
-                ]
-              }
+              "defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
+              "initialLoad": "Enabled"
             }
           }
         },
@@ -165,20 +145,38 @@
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
-              "editableHeaderContent": false,
               "contextPath": "/Sales",
-              "navigation": {}
+              "navigation": {
+                "items": {
+                  "detail": {
+                    "route": "Sales_itemsObjectPage"
+                  }
+                }
+              },
+              "sectionLayout": "Tabs",
+              "editableHeaderContent": false,
+              "content": {
+                "header": {
+                  "visible": true
+                }
+              }
             }
           }
         },
-        "SalesReturnsObjectPage": {
+        "Sales_itemsObjectPage": {
           "type": "Component",
-          "id": "SalesReturnsObjectPage",
+          "id": "Sales_itemsObjectPage",
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
+              "contextPath": "/Sales/items",
               "navigation": {},
-              "contextPath": "/SalesReturns"
+              "editableHeaderContent": false,
+              "content": {
+                "header": {
+                  "visible": true
+                }
+              }
             }
           }
         }

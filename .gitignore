@@ -28,3 +28,5 @@ db.sqlite-wal
 
 
 *.http
+
+*.csv

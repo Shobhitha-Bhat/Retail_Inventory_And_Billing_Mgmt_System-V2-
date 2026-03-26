@@ -13,6 +13,7 @@ service SalesService{
     entity SalesReturnStatus as projection on db.SalesReturnStatus;
     entity MockCustomers as projection on db.MockCustomers;
     entity Items as projection on db.Items;
+
     
     entity SalesItems as projection on db.SalesItems
     actions{

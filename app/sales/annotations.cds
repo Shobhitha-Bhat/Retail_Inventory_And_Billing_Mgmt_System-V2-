@@ -108,10 +108,23 @@ annotate service.Sales with @(
         },
         Text : 'Sales',
     },
+    UI.HeaderInfo : {
+        Title : {
+            $Type : 'UI.DataField',
+            Value : customer.customername,
+        },
+        TypeName : '',
+        TypeNamePlural : '',
+    },
 );
 
 annotate service.SalesItems with @(
     UI.LineItem #InvoiceItems : [
+        {
+            $Type : 'UI.DataField',
+            Value : ID,
+            Label : 'ID',
+        },
         {
             $Type : 'UI.DataField',
             Value : parentSales_ID,
@@ -120,37 +133,12 @@ annotate service.SalesItems with @(
         {
             $Type : 'UI.DataField',
             Value : item_ID,
-            Label : 'item',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : gstPercent,
-            Label : 'gstPercent',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : marginPercent,
-            Label : 'marginPercent',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : costPrice,
-            Label : 'costPrice',
+            Label : 'item_ID',
         },
         {
             $Type : 'UI.DataField',
             Value : quantity,
             Label : 'quantity',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : sellingPrice,
-            Label : 'sellingPrice',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : totalAmount,
-            Label : 'totalAmount',
         },
         {
             $Type : 'UI.DataFieldForAction',
@@ -162,7 +150,149 @@ annotate service.SalesItems with @(
             Action : 'SalesService.returnItems',
             Label : 'returnItems',
         },
-    ]
+        {
+            $Type : 'UI.DataField',
+            Value : totalPayableAmount,
+            Label : 'totalPayableAmount',
+        },
+    ],
+    UI.Facets : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            Label : 'Purchased Item Information',
+            ID : 'PurchasedItemInformation',
+            Target : '@UI.FieldGroup#PurchasedItemInformation',
+        },
+    ],
+    UI.FieldGroup #SalesItemInformation : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : ID,
+                Label : 'ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : parentSales_ID,
+                Label : 'parentSales_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item_ID,
+                Label : 'item_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.gstPercent,
+                Label : 'gstPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.itemBasePrice,
+                Label : 'itemBasePrice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.totalCostprice,
+                Label : 'totalCostprice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : quantity,
+                Label : 'quantity',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.marginPercent,
+                Label : 'marginPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : sellingPrice,
+                Label : 'sellingPrice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : totalAmount,
+                Label : 'totalAmount',
+            },
+        ],
+    },
+    UI.FieldGroup #newsection : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+        ],
+    },
+    UI.HeaderInfo : {
+        TypeName : '',
+        TypeNamePlural : '',
+    },
+    UI.FieldGroup #PurchasedItemInformation : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : ID,
+                Label : 'ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : parentSales_ID,
+                Label : 'parentSales_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item_ID,
+                Label : 'item_ID',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.gstPercent,
+                Label : 'gstPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.itemBasePrice,
+                Label : 'itemBasePrice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.totalCostprice,
+                Label : 'totalCostprice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : item.marginPercent,
+                Label : 'marginPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : quantity,
+                Label : 'quantity',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : sellingPrice,
+                Label : 'sellingPrice',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : discountPercent,
+                Label : 'discountPercent',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : totalAmount,
+                Label : 'totalAmount',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : totalPayableAmount,
+                Label : 'totalPayableAmount',
+            },
+        ],
+    },
 );
 
 annotate service.SalesReturns with @(
@@ -285,14 +415,6 @@ annotate service.SalesItems with {
         Common.ExternalID : item.itemName,
         )};
 
-annotate service.Items with {
-    ID @(
-        Common.Text : itemName,
-        Common.Text.@UI.TextArrangement : #TextLast,
-)};
-
-
-
 annotate service.Sales with {
     paymentStatus @(
         Common.ExternalID : paymentStatus.payStatus,
@@ -347,4 +469,8 @@ annotate service.Items with {
         },
         Common.ValueListWithFixedValues : true,
 )};
+
+annotate service.SalesItems with {
+    discountPercent @Common.FieldControl : #Mandatory
+};
 

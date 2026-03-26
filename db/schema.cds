@@ -27,7 +27,6 @@ entity CategoryStatus:cuid{
 // @odata.draft.enabled
 entity Items : cuid, managed {
     itemName      : String;
-    marginPercent : Decimal(5, 2);
     category      : Association to Categories ;
     // status        : String enum {
     //     ACTIVE;
@@ -37,6 +36,7 @@ entity Items : cuid, managed {
     itemBasePrice:Decimal(10,2);
     gstPercent    : Decimal(5, 2);
     totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));
+    marginPercent : Decimal(5, 2);
 
 }
 
@@ -211,12 +211,17 @@ entity SalesReturnStatus:cuid{
 entity SalesItems : cuid, managed {
     parentSales   : Association to Sales;
     item          : Association to Items;
+
+    // costPrice     : Decimal(10, 2); // from Inventory
+    // gstPercent    : Decimal(5, 2); // output GST from Inventory
+    // totalCostprice:Decimal(10,2) = (costPrice+((costPrice*gstPercent)/100));
+    // marginPercent : Decimal(5, 2); // from Items
+
     quantity      : Integer;
-    costPrice     : Decimal(10, 2); // from Inventory
-    gstPercent    : Decimal(5, 2); // output GST from Inventory
-    marginPercent : Decimal(5, 2); // from Items
-    sellingPrice  : Decimal(10, 2); // calculated
-    totalAmount   : Decimal(12, 2);
+    sellingPrice  : Decimal(10, 2) @Core.Computed; // calculated using item information
+    discountPercent:Decimal(10,2);  //entered using filling form
+    totalAmount   : Decimal(12, 2) @Core.Computed; //calculated using selling price and quantity
+    totalPayableAmount:Decimal(12,2) @Core.Computed;//discounting from totalAmount
 }
 
 @odata.draft.enabled

@@ -13,6 +13,11 @@ annotate service.Customers with @(
                 Label : 'city',
                 Value : city,
             },
+            {
+                $Type : 'UI.DataField',
+                Value : contactNumber,
+                Label : 'contactNumber',
+            },
         ],
     },
     UI.Facets : [
@@ -38,6 +43,11 @@ annotate service.Customers with @(
             $Type : 'UI.DataField',
             Label : 'city',
             Value : city,
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : contactNumber,
+            Label : 'contactNumber',
         },
     ],
 );
