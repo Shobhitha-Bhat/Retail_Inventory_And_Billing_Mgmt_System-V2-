@@ -331,6 +331,23 @@ annotate service.SalesReturns with @(
             Target : 'returnItems/@UI.LineItem#ReturningItems',
         },
     ],
+    UI.LineItem #tableView1 : [
+    ],
+    UI.SelectionPresentationVariant #tableView1 : {
+        $Type : 'UI.SelectionPresentationVariantType',
+        PresentationVariant : {
+            $Type : 'UI.PresentationVariantType',
+            Visualizations : [
+                '@UI.LineItem#tableView1',
+            ],
+        },
+        SelectionVariant : {
+            $Type : 'UI.SelectionVariantType',
+            SelectOptions : [
+            ],
+        },
+        Text : 'Table View SalesReturns 1',
+    },
 );
 
 annotate service.SalesReturnItems with @(

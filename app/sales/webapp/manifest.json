@@ -100,6 +100,16 @@
           "pattern": "Sales({key})/items({itemsKey}):?query:",
           "name": "Sales_itemsObjectPage",
           "target": "Sales_itemsObjectPage"
+        },
+        {
+          "name": "SalesReturnsObjectPage",
+          "pattern": "SalesReturns({SalesReturnsKey}):?query:",
+          "target": "SalesReturnsObjectPage"
+        },
+        {
+          "name": "SalesReturns_returnItemsObjectPage",
+          "pattern": "SalesReturns({SalesReturnsKey})/returnItems({returnItemsKey}):?query:",
+          "target": "SalesReturns_returnItemsObjectPage"
         }
       ],
       "targets": {
@@ -115,6 +125,11 @@
                 "Sales": {
                   "detail": {
                     "route": "SalesObjectPage"
+                  }
+                },
+                "SalesReturns": {
+                  "detail": {
+                    "route": "SalesReturnsObjectPage"
                   }
                 }
               },
@@ -135,7 +150,20 @@
                 }
               },
               "defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
-              "initialLoad": "Enabled"
+              "initialLoad": "Enabled",
+              "views": {
+                "paths": [
+                  {
+                    "key": "tableView",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
+                  },
+                  {
+                    "key": "tableView1",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView1",
+                    "entitySet": "SalesReturns"
+                  }
+                ]
+              }
             }
           }
         },
@@ -177,6 +205,34 @@
                   "visible": true
                 }
               }
+            }
+          }
+        },
+        "SalesReturnsObjectPage": {
+          "type": "Component",
+          "id": "SalesReturnsObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "navigation": {
+                "returnItems": {
+                  "detail": {
+                    "route": "SalesReturns_returnItemsObjectPage"
+                  }
+                }
+              },
+              "contextPath": "/SalesReturns"
+            }
+          }
+        },
+        "SalesReturns_returnItemsObjectPage": {
+          "type": "Component",
+          "id": "SalesReturns_returnItemsObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "navigation": {},
+              "contextPath": "/SalesReturns/returnItems"
             }
           }
         }

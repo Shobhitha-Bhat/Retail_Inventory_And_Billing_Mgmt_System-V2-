@@ -5,6 +5,7 @@ service SalesService{
     actions{
         action payForPurchase() returns Sales;
         action returnEntirePurchase() returns Sales;
+        @Core.MediaType: 'application/pdf'
         action generateInvoice() returns LargeBinary;
         action addnewCustomer(customername:String,city:String,contactNumber:String(20));
     }
@@ -13,6 +14,10 @@ service SalesService{
     entity SalesReturnStatus as projection on db.SalesReturnStatus;
     entity MockCustomers as projection on db.MockCustomers;
     entity Items as projection on db.Items;
+    entity Departments as projection on db.Departments;
+    entity PassbookEntryTypes as projection on db.PassbookEntryTypes;
+    entity RetailLedger as projection on db.RetailLedger;
+    entity Inventory as projection on db.Inventory;
 
     
     entity SalesItems as projection on db.SalesItems
