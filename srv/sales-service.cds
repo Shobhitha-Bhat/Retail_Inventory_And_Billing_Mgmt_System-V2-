@@ -5,7 +5,6 @@ service SalesService{
     actions{
         action payForPurchase() returns Sales;
         action returnEntirePurchase() returns Sales;
-        @Core.MediaType: 'application/pdf'
         action generateInvoice() returns LargeBinary;
         action addnewCustomer(customername:String,city:String,contactNumber:String(20));
     }

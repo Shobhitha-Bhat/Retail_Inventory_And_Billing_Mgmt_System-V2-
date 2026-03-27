@@ -345,6 +345,21 @@ annotate service.SalesReturns with @(
         },
     ],
     UI.LineItem #tableView1 : [
+        {
+            $Type : 'UI.DataField',
+            Value : ID,
+            Label : 'ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : originalSales_ID,
+            Label : 'originalSales_ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : originalSales.customer.customername,
+            Label : 'customername',
+        },
     ],
     UI.SelectionPresentationVariant #tableView1 : {
         $Type : 'UI.SelectionPresentationVariantType',

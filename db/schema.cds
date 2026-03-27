@@ -233,7 +233,7 @@ entity SalesReturns : cuid, managed {
 
 entity SalesReturnItems : cuid, managed {
     parentReturn : Association to SalesReturns;
-    item         : Association to SalesItems;
+    saleitem         : Association to SalesItems;
     quantity     : Integer;
 
 }
