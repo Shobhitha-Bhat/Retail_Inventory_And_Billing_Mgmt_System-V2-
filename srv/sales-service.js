@@ -103,6 +103,12 @@ this.on('generateInvoice', async (req) => {
             if(!itemInfo){
                 return req.error(404,"Item Not Found")
             }
+
+            //just double checking stock availability
+            const inventoryQuantity = await SELECT.one.from(Inventory).where({inventoryItem_ID: itemInfo.ID })
+            if(itemInfo.quantity > inventoryQuantity.quantity){
+                return req.error(400,`LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
+            }
             
             const totalCostPricePerUnit = (itemInfo.itemBasePrice + ((itemInfo.itemBasePrice * itemInfo.gstPercent) / 100))
             item.sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * itemInfo.marginPercent / 100);
@@ -112,6 +118,20 @@ this.on('generateInvoice', async (req) => {
             item.totalPayableAmount = item.totalAmount - discountAmt;
         }
     });
+
+    this.on('checkStockAvailability',async(req)=>{
+        const {ID}=req.params[1]  //id of salesitems
+
+        const salesItemsRecord = await SELECT.one.from(req.target).where({ID:ID})
+        if(!salesItemsRecord){
+            return req.error(404,"SalesItem Not found")
+        }
+
+         const inventoryQuantity = await SELECT.one.from(Inventory).where({inventoryItem_ID: salesItemsRecord.item_ID })
+            if(salesItemsRecord.quantity > inventoryQuantity.quantity){
+                return req.error(400,`LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
+            }else req.info("Available")
+    })
 
     this.on('addnewCustomer',async(req)=>{
         const {customername,city,contactNumber} = req.data;

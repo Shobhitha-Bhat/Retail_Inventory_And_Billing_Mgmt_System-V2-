@@ -22,6 +22,7 @@ service SalesService{
     
     entity SalesItems as projection on db.SalesItems
     actions{
+        action checkStockAvailability();
         action removeItemsFromShopping(quantity:Integer) returns SalesItems;    //before paying for a purchase
         action returnItems(quantity:Integer) returns SalesItems;               // after paying 
     }

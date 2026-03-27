@@ -36,6 +36,6 @@ module.exports = function(){
         }
 
         // 4. Inject the persistent balance into the request data
-        req.data.currentBalance = newBalance;
+        req.data.currentBalance = Number(newBalance.toFixed(2));
     });
 }

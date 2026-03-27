@@ -181,7 +181,7 @@
                   }
                 }
               },
-              "sectionLayout": "Tabs",
+              "sectionLayout": "Page",
               "editableHeaderContent": false,
               "content": {
                 "header": {
@@ -204,7 +204,8 @@
                 "header": {
                   "visible": true
                 }
-              }
+              },
+              "sectionLayout": "Page"
             }
           }
         },

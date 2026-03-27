@@ -92,6 +92,11 @@ annotate service.Sales with @(
             Value : returnStatus.retStatus,
             Label : 'retStatus',
         },
+        {
+            $Type : 'UI.DataField',
+            Value : paymentStatus_ID,
+            Label : 'paymentStatus_ID',
+        },
     ],
     UI.SelectionPresentationVariant #tableView : {
         $Type : 'UI.SelectionPresentationVariantType',
@@ -291,8 +296,16 @@ annotate service.SalesItems with @(
                 Value : totalPayableAmount,
                 Label : 'totalPayableAmount',
             },
+            {
+                $Type : 'UI.DataFieldForAction',
+                Action : 'SalesService.checkStockAvailability',
+                Label : 'checkStockAvailability',
+            },
         ],
     },
+    UI.Identification : [
+        
+    ],
 );
 
 annotate service.SalesReturns with @(
@@ -346,7 +359,7 @@ annotate service.SalesReturns with @(
             SelectOptions : [
             ],
         },
-        Text : 'Table View SalesReturns 1',
+        Text : 'SalesReturns',
     },
 );
 
