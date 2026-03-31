@@ -6,7 +6,7 @@ const { SELECT, UPDATE } = require('@sap/cds/lib/ql/cds-ql');
 
 module.exports = cds.service.impl(function () {
 
-    const { Sales, SalesItems, SalesPayStatus, SalesReturns, SalesReturnStatus, Items, MockCustomers, RetailLedger, Departments, PassbookEntryTypes, Inventory } = this.entities;
+    const { Sales, SalesItems, SalesItemStatus,SalesReturnItems, SalesPayStatus, SalesReturns, SalesReturnStatus, Items, MockCustomers, RetailLedger, Departments, PassbookEntryTypes, Inventory } = this.entities;
 
 
     this.on('generateInvoice', async (req) => {
@@ -93,10 +93,11 @@ module.exports = cds.service.impl(function () {
 
 
 
-    this.before('CREATE', 'Sales', async (req) => {
+    this.before(['CREATE', 'UPDATE'], 'Sales', async (req) => {
         // req.data "IS" the Sales record. 
         // It contains 'customer_ID', 'paymentStatus_ID', and 'items'.
         const { items } = req.data;
+        let billamount = 0;
         for (const item of items) {
             //fetch iteminfo
             const itemInfo = await SELECT.one.from(Items).where({ ID: item.item_ID });
@@ -106,6 +107,9 @@ module.exports = cds.service.impl(function () {
 
             //just double checking stock availability
             const inventoryQuantity = await SELECT.one.from(Inventory).where({ inventoryItem_ID: itemInfo.ID })
+            if (item.quantity == null || item.quantity <= 0) {
+                return req.error(400, "Enter a valid quantity")
+            }
             if (itemInfo.quantity > inventoryQuantity.quantity) {
                 return req.error(400, `LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
             }
@@ -116,7 +120,9 @@ module.exports = cds.service.impl(function () {
             item.totalAmount = item.quantity * item.sellingPrice;
             const discountAmt = (item.totalAmount * item.discountPercent) / 100;
             item.totalPayableAmount = item.totalAmount - discountAmt;
+            billamount += item.totalPayableAmount;
         }
+        req.data.billTotal = billamount;
     });
 
     this.on('checkStockAvailability', async (req) => {
@@ -127,7 +133,13 @@ module.exports = cds.service.impl(function () {
             return req.error(404, "SalesItem Not found")
         }
 
+        if (salesItemsRecord.quantity == null || salesItemsRecord.quantity <= 0) {
+            return req.error(400, "Enter a valid quantity")
+        }
         const inventoryQuantity = await SELECT.one.from(Inventory).where({ inventoryItem_ID: salesItemsRecord.item_ID })
+        if (!inventoryQuantity) {
+            return req.error(404, "Item Not in Inventory")
+        }
         if (salesItemsRecord.quantity > inventoryQuantity.quantity) {
             return req.error(400, `LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
         } else req.info("Available")
@@ -160,18 +172,27 @@ module.exports = cds.service.impl(function () {
         if (!purchasePayStatus) {
             return req.error(404, "Status Not found")
         }
-        if(saleRecord.paymentStatus_ID === purchasePayStatus.ID ){
-            return req.error(404,"Purchase Already Paid")
-        }
-        await UPDATE(Sales).set({ paymentStatus_ID: purchasePayStatus.ID }).where({ ID: ID })
-        req.info("Purchase Paid")
-        for (const item of saleRecord.items) {
-            updateLedger(item, req, "SALES", "CREDIT");
-            req.info("Ledger Updated")
-            updateInventory(item, req, "Purchase");
-            req.info("Inventory Updated")
+        if (saleRecord.paymentStatus_ID === purchasePayStatus.ID) {
+            return req.error(404, "Purchase Already Paid")
         }
 
+        const saleItemStatus = await SELECT.one.from(SalesItemStatus).where({ saleItStatus: 'Paid' })
+        if (!saleItemStatus) {
+            return req.error(404, "Status Not found")
+        }
+
+        for (const item of saleRecord.items) {
+            if (item.itemStatus_ID === saleItemStatus.ID) {
+                return req.error(400, `Some Items in the purchase are already paid.Please Check again.`)
+            }
+            await updateLedger(item, req, "SALES", "CREDIT");
+            await updateInventory(item, req, "Purchase");
+        }
+        req.info("Ledger Updated")
+        req.info("Inventory Updated")
+        await UPDATE(SalesItems).set({ itemStatus_ID: saleItemStatus.ID }).where({ parentSales_ID: ID })
+        await UPDATE(Sales).set({ paymentStatus_ID: purchasePayStatus.ID }).where({ ID: ID })
+        req.info("Purchase Paid")
         return await SELECT.one.from(Sales).where({ ID: ID })
 
 
@@ -195,17 +216,17 @@ module.exports = cds.service.impl(function () {
         let newBalance;
         if (transactionType === "CREDIT")
             newBalance = previousBalance + item.totalPayableAmount;
-        else if(transactionType === "DEBIT")
+        else if (transactionType === "DEBIT")
             newBalance = previousBalance - item.totalPayableAmount;
 
 
 
-            await INSERT.into(RetailLedger).entries({
-                entryType_ID: debitRecord.ID,
-                department_ID: deptRecord.ID,
-                amount: item.totalPayableAmount,
-                currentBalance: newBalance
-            })
+        await INSERT.into(RetailLedger).entries({
+            entryType_ID: debitRecord.ID,
+            department_ID: deptRecord.ID,
+            amount: item.totalPayableAmount,
+            currentBalance: newBalance
+        })
     }
 
 
@@ -216,9 +237,13 @@ module.exports = cds.service.impl(function () {
                 await UPDATE(Inventory).set({
                     quantity: { '-=': item.quantity },
                 }).where({ ID: existingStock.ID })
-            } else if (action === "Return") {
+            } else if (action === "Full Return") {
                 await UPDATE(Inventory).set({
                     quantity: { '+=': item.quantity },
+                }).where({ ID: existingStock.ID })
+            } else if (action === "Partial Return") {
+                await UPDATE(Inventory).set({
+                    quantity: { '+=': req.data.quantity },
                 }).where({ ID: existingStock.ID })
             }
         }
@@ -237,37 +262,161 @@ module.exports = cds.service.impl(function () {
             return req.error(400, "Sales not found")
         }
 
+        let purchasePayStatus = await SELECT.one.from(SalesPayStatus).where({ payStatus: "Paid" })
+        if (!purchasePayStatus) {
+            return req.error(404, "Status Not found")
+        }
+        if (salesRecord.paymentStatus_ID !== purchasePayStatus.ID) {
+            return req.error(404, "Purchase Not Paid")
+        }
         const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: 'CompleteReturn' })
         if (!salesReturnRecord) {
             return req.error(404, "Return record not found")
         }
-        if(salesRecord.returnStatus_ID === salesReturnRecord.ID){
-            return req.error(400,"Purchase already returned")
+        if (salesRecord.returnStatus_ID === salesReturnRecord.ID) {
+            return req.error(400, "Purchase already returned")
         }
-        await UPDATE(Sales).set({ returnStatus_ID: salesReturnRecord.ID }).where({ ID: ID })
 
-        const returnItemArray = [];
+        const saleItemStatus = await SELECT.one.from(SalesItemStatus).where({ saleItStatus: 'Full Return' })
+        if (!saleItemStatus) {
+            return req.error(404, "Status Not found")
+        }
+        let returnItemArray = [];
         for (const item of salesRecord.items) {
+            if (item.itemStatus_ID === saleItemStatus.ID) {
+                //this item was already returned
+                continue;
+            }
             returnItemArray.push({
                 saleitem_ID: item.ID,
                 quantity: item.quantity
             })
             //update inventory
-            updateInventory(item, req, "Return");
+            updateInventory(item, req, "Full Return");
             updateLedger(item, req, "SALES", "DEBIT")
 
         }
 
+        req.info("Order Returned | Inventory Updated | Ledger Updated")
+        await UPDATE(SalesItems).set({ itemStatus_ID: saleItemStatus.ID }).where({ parentSales_ID: ID })
+        await UPDATE(Sales).set({ returnStatus_ID: salesReturnRecord.ID }).where({ ID: ID })
         await INSERT.into(SalesReturns).entries({
             originalSales_ID: ID,
             returnItems: returnItemArray
         })
 
-        req.info("Order Returned | Inventory Updated | Ledger Updated")
-
+        return await SELECT.one.from(Sales).where({ ID: ID })
 
     })
 
+    async function updateLedgerForPartialItemReturn(item, req, department, transactionType) {
+        const deptRecord = await SELECT.one.from(Departments).where({ dept: department });
+        if (!deptRecord) return req.error(400, 'Invalid Department');
+
+        const debitRecord = await SELECT.one.from(PassbookEntryTypes).where({ entryType: transactionType })
+        if (!debitRecord) return req.error(400, `${transactionType} not found`)
+
+        const lastEntry = await SELECT.one.from(RetailLedger)
+            .columns('currentBalance')
+            .orderBy('createdAt desc');
+
+        const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        let newBalance, amountToLog;
+        if (transactionType === "CREDIT") {
+            amountToLog = item.totalPayableAmount
+            newBalance = previousBalance + amountToLog;
+        }
+        else if (transactionType === "DEBIT") {
+            amountToLog = (item.totalPayableAmount / item.quantity) * req.data.quantity
+            newBalance = previousBalance - amountToLog;
+        }
+        await INSERT.into(RetailLedger).entries({
+            entryType_ID: debitRecord.ID,
+            department_ID: deptRecord.ID,
+            amount: amountToLog,
+            currentBalance: newBalance
+        })
+    }
+
+    this.on('returnItems', async (req) => {
+        const { quantity } = req.data
+        const { ID } = req.params[1]; //salesitems id
+
+
+        const salesitem = await SELECT.one.from(SalesItems).where({ ID: ID })
+        if (quantity == null || quantity < 0 || quantity > (salesitem.quantity - salesitem.returnedQuantity)) {
+            return req.error(400, "Quantity to be returned must be less than purchased/ remaining")
+        }
+        // req.info(`${salesitem.ID}`)
+        const parentsale = await SELECT.one.from(Sales).where({ ID: salesitem.parentSales_ID })
+
+        let purchasePayStatus = await SELECT.one.from(SalesPayStatus).where({ payStatus: "Paid" })
+        if (!purchasePayStatus) {
+            return req.error(404, "Status Not found")
+        }
+        if (parentsale.paymentStatus_ID !== purchasePayStatus.ID) {
+            return req.error(404, "Purchase Not Paid")
+        }
+
+
+        let saleItemStatus = await SELECT.one.from(SalesItemStatus).where({ saleItStatus: 'Full Return' })
+        if (!saleItemStatus) {
+            return req.error(404, "Status Not found")
+        }
+        if (salesitem.itemStatus_ID === saleItemStatus.ID) {
+            return req.error(400, "Item already returned")
+        }
+
+        await UPDATE(SalesItems).set({ returnedQuantity: { '+=': quantity } }).where({ ID: ID })
+
+        let status;
+        if (quantity == (salesitem.quantity - salesitem.returnedQuantity)) {
+            status = 'Full Return'
+            await updateInventory(salesitem, req, status)
+            await updateLedger(salesitem, req, "SALES", "DEBIT")
+        } else if (quantity < (salesitem.quantity - salesitem.returnedQuantity)) {
+            status = 'Partial Return'
+            await updateInventory(salesitem, req, status)
+            await updateLedgerForPartialItemReturn(salesitem, req, "SALES", "DEBIT")
+        }
+
+
+
+
+        saleItemStatus = await SELECT.one.from(SalesItemStatus).where({ saleItStatus: status })
+        if (!saleItemStatus) {
+            return req.error(404, "Status Not found")
+        }
+
+        const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: 'Partial' })
+        if (!salesReturnRecord) {
+            return req.error(404, "Return record not found")
+        }
+
+
+        await UPDATE(SalesItems).set({ itemStatus_ID: saleItemStatus.ID }).where({ ID: ID })
+        await UPDATE(Sales).set({ returnStatus_ID: salesReturnRecord.ID }).where({ ID: salesitem.parentSales_ID })
+        req.info("Item(s) Returned | Inventory Updated | Ledger Updated")
+
+        let returnItemArray = [];
+            returnItemArray.push({
+                saleitem_ID: salesitem.ID,
+                quantity: quantity
+            })
+
+            const existingSalesReturnItems = await SELECT.one.from(SalesReturnItems).where({ saleitem_ID: ID })
+            if(existingSalesReturnItems){
+                await UPDATE(SalesReturnItems)
+                .set({quantity:{'+=':quantity}})
+                .where({saleitem_ID: ID })
+            }else{
+                await INSERT.into(SalesReturns).entries({
+               originalSales_ID: salesitem.parentSales_ID,
+               returnItems: returnItemArray
+           })
+            }
+
+    })
 });
 
 

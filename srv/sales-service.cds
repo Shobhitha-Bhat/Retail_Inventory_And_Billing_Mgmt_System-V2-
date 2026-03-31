@@ -26,6 +26,7 @@ service SalesService{
         action returnItems(quantity:Integer) returns SalesItems;               // after paying 
     }
 
+entity SalesItemStatus as projection on db.SalesItemStatus;
     entity SalesReturns as projection on db.SalesReturns;
-   // entity SalesReturnItems as projection on db.SalesReturnItems;   already exposed by SalesReturns and since no bound actions to this its not projected explicitly
+//    entity SalesReturnItems as projection on db.SalesReturnItems;   //already exposed by SalesReturns and since no bound actions to this its not projected explicitly
 }

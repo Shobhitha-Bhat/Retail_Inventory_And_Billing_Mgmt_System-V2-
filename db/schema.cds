@@ -194,8 +194,9 @@ entity Sales : cuid, managed {
     //     Partial;
     //     CompleteReturn;
     // }
-    paymentStatus:Association to SalesPayStatus;
-    returnStatus:Association to SalesReturnStatus;
+    paymentStatus:Association to SalesPayStatus default '78493af3-1732-450d-9970-ba53be69c9ac';
+    returnStatus:Association to SalesReturnStatus default '2caa2484-0788-48bd-b45b-9f14ba6f3dd8';
+    billTotal:Decimal(15,2) @Core.Computed;
 }
 
 
@@ -218,12 +219,17 @@ entity SalesItems : cuid, managed {
     // marginPercent : Decimal(5, 2); // from Items
 
     quantity      : Integer;
+    returnedQuantity:Integer default 0;
+    itemStatus:Association to SalesItemStatus default '131ce0ae-758d-4144-b92d-8bf61abbf9a9' ;
     sellingPrice  : Decimal(10, 2) @Core.Computed; // calculated using item information
-    discountPercent:Decimal(10,2);  //entered using filling form
     totalAmount   : Decimal(12, 2) @Core.Computed; //calculated using selling price and quantity
+    discountPercent:Decimal(10,2) default 0.00;  //entered using filling form
     totalPayableAmount:Decimal(12,2) @Core.Computed;//discounting from totalAmount
 }
 
+entity SalesItemStatus:cuid,managed{
+    saleItStatus:String;
+}
 @odata.draft.enabled
 entity SalesReturns : cuid, managed {
     originalSales : Association to Sales;

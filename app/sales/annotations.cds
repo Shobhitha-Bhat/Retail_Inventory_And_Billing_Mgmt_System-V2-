@@ -35,6 +35,11 @@ annotate service.Sales with @(
                 Action : 'SalesService.addnewCustomer',
                 Label : 'addnewCustomer',
             },
+            {
+                $Type : 'UI.DataField',
+                Value : billTotal,
+                Label : 'billTotal',
+            },
         ],
     },
     UI.Facets : [
@@ -86,6 +91,11 @@ annotate service.Sales with @(
             $Type : 'UI.DataField',
             Value : customer.city,
             Label : 'city',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : billTotal,
+            Label : 'billTotal',
         },
         {
             $Type : 'UI.DataField',
@@ -159,6 +169,16 @@ annotate service.SalesItems with @(
             $Type : 'UI.DataField',
             Value : totalPayableAmount,
             Label : 'totalPayableAmount',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : itemStatus_ID,
+            Label : 'itemStatus_ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : returnedQuantity,
+            Label : 'returnedQuantity',
         },
     ],
     UI.Facets : [
@@ -253,6 +273,11 @@ annotate service.SalesItems with @(
             },
             {
                 $Type : 'UI.DataField',
+                Value : itemStatus_ID,
+                Label : 'itemStatus_ID',
+            },
+            {
+                $Type : 'UI.DataField',
                 Value : item.gstPercent,
                 Label : 'gstPercent',
             },
@@ -300,6 +325,11 @@ annotate service.SalesItems with @(
                 $Type : 'UI.DataFieldForAction',
                 Action : 'SalesService.checkStockAvailability',
                 Label : 'checkStockAvailability',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : returnedQuantity,
+                Label : 'returnedQuantity',
             },
         ],
     },
@@ -387,18 +417,13 @@ annotate service.SalesReturnItems with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : item_ID,
-            Label : 'item_ID',
-        },
-        {
-            $Type : 'UI.DataField',
             Value : quantity,
             Label : 'quantity',
         },
         {
             $Type : 'UI.DataField',
-            Value : item.totalAmount,
-            Label : 'totalAmount',
+            Value : saleitem_ID,
+            Label : 'saleitem_ID',
         },
     ]
 );
@@ -517,5 +542,31 @@ annotate service.Items with {
 
 annotate service.SalesItems with {
     discountPercent @Common.FieldControl : #Mandatory
+};
+
+annotate service.SalesItems with {
+    itemStatus @(
+        Common.ExternalID : itemStatus.saleItStatus,
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'SalesItemStatus',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : itemStatus_ID,
+                    ValueListProperty : 'ID',
+                },
+            ],
+            Label : 'SalesItemStatus',
+        },
+        Common.ValueListWithFixedValues : true,
+)};
+
+annotate service.SalesItems with {
+    quantity @Common.FieldControl : #Mandatory
+};
+
+annotate service.SalesReturnItems with {
+    saleitem @Common.ExternalID : saleitem.item.itemName
 };
 
