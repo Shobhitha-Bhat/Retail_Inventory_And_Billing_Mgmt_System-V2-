@@ -58,6 +58,16 @@ annotate service.Inventory with @(
             $Type : 'UI.DataField',
             Label : 'quantity',
             Value : quantity,
+            Criticality : {
+                $edmJson : {
+                    $If : [
+                        { $Lt : [ { $Path : 'quantity' }, 10 ] },
+                        1, // If quantity < 10, return 1 (Red)
+                        3  // Else, return 3 (Green) or 0 for neutral
+                    ]
+                }
+            },
+            CriticalityRepresentation : #WithoutIcon
         },
         {
             $Type : 'UI.DataField',
@@ -70,6 +80,21 @@ annotate service.Inventory with @(
             Label : 'status_ID',
         },
     ],
+    UI.DataPoint #progress : {
+        $Type : 'UI.DataPointType',
+        Value : quantity,
+        Title : 'quantity',
+        TargetValue : 100,
+        Visualization : #Progress,
+    },
+    UI.HeaderFacets : [
+        
+    ],
+    UI.DataPoint #status_ID : {
+        $Type : 'UI.DataPointType',
+        Value : status_ID,
+        Title : 'status_ID',
+    },
 );
 
 annotate service.Inventory with {

@@ -1,8 +1,10 @@
 using {my.retailshop as db} from '../db/schema';
 
+
 service MasterDataService{
     entity Categories as projection on db.Categories
     actions{
+        @(requires:'categorymanager')
         action discontinueCategory() returns Categories;
         action continueCategory() returns Categories;
     }
@@ -26,3 +28,9 @@ entity ItemStatus as projection on db.ItemStatus;
     }
     entity DistributorStatus as projection on db.DistributorStatus;
 }
+
+// annotate MasterDataService.Categories with @(restrict: [
+//     { grant: '*', to: 'admin' },
+//     { grant: ['READ', 'discontinueCategory', 'continueCategory'], to: 'categorymanager' },
+//     { grant: 'READ', to: 'support' }
+// ]);

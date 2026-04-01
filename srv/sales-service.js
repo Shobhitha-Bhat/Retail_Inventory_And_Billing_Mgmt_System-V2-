@@ -2,11 +2,11 @@
 const PDFDocument = require('pdfkit');
 const { PassThrough } = require('stream');
 const cds = require('@sap/cds');
-const { SELECT, UPDATE } = require('@sap/cds/lib/ql/cds-ql');
+const { SELECT, UPDATE, DELETE } = require('@sap/cds/lib/ql/cds-ql');
 
 module.exports = cds.service.impl(function () {
 
-    const { Sales, SalesItems, SalesItemStatus,SalesReturnItems, SalesPayStatus, SalesReturns, SalesReturnStatus, Items, MockCustomers, RetailLedger, Departments, PassbookEntryTypes, Inventory } = this.entities;
+    const { Sales, SalesItems, SalesItemStatus, SalesReturnItems, SalesPayStatus, SalesReturns, SalesReturnStatus, Items, MockCustomers, RetailLedger, Departments, PassbookEntryTypes, Inventory } = this.entities;
 
 
     this.on('generateInvoice', async (req) => {
@@ -381,40 +381,115 @@ module.exports = cds.service.impl(function () {
         }
 
 
-
-
         saleItemStatus = await SELECT.one.from(SalesItemStatus).where({ saleItStatus: status })
         if (!saleItemStatus) {
             return req.error(404, "Status Not found")
         }
 
-        const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: 'Partial' })
-        if (!salesReturnRecord) {
-            return req.error(404, "Return record not found")
-        }
+
+        // await checkAndUpdatePurchase(req);
+        // const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: 'Partial' })
+        // if (!salesReturnRecord) {
+        //     return req.error(404, "Return record not found")
+        // }
+        // await UPDATE(Sales).set({ returnStatus_ID: salesReturnRecord.ID }).where({ ID: salesitem.parentSales_ID })
 
 
         await UPDATE(SalesItems).set({ itemStatus_ID: saleItemStatus.ID }).where({ ID: ID })
-        await UPDATE(Sales).set({ returnStatus_ID: salesReturnRecord.ID }).where({ ID: salesitem.parentSales_ID })
+        await checkAndUpdatePurchase(req);
+
         req.info("Item(s) Returned | Inventory Updated | Ledger Updated")
 
         let returnItemArray = [];
-            returnItemArray.push({
-                saleitem_ID: salesitem.ID,
-                quantity: quantity
-            })
+        returnItemArray.push({
+            saleitem_ID: salesitem.ID,
+            quantity: quantity
+        })
 
-            const existingSalesReturnItems = await SELECT.one.from(SalesReturnItems).where({ saleitem_ID: ID })
-            if(existingSalesReturnItems){
-                await UPDATE(SalesReturnItems)
-                .set({quantity:{'+=':quantity}})
-                .where({saleitem_ID: ID })
-            }else{
-                await INSERT.into(SalesReturns).entries({
-               originalSales_ID: salesitem.parentSales_ID,
-               returnItems: returnItemArray
-           })
+        const existingSalesReturnItems = await SELECT.one.from(SalesReturnItems).where({ saleitem_ID: ID })
+        if (existingSalesReturnItems) {
+            await UPDATE(SalesReturnItems)
+                .set({ quantity: { '+=': quantity } })
+                .where({ saleitem_ID: ID })
+        } else {
+            await INSERT.into(SalesReturns).entries({
+                originalSales_ID: salesitem.parentSales_ID,
+                returnItems: returnItemArray
+            })
+        }
+
+        await SELECT.one.from(SalesItems).where({ ID: ID })
+
+    })
+
+
+    async function checkAndUpdatePurchase(req) {
+        const { ID } = req.params[0];  //sale id
+        const saleRecord = await SELECT.one.from(Sales).where({ ID: ID }).columns(record => {
+            record('*');               // All fields from Sales
+            record.items(item => {      // Expand the 'items' composition
+                item('*');             // All fields from SalesItems
+            });
+        });
+        if (!saleRecord) {
+            return req.error(400, "Cant find required Sale Record for Status Updation")
+        }
+        let itemcount = 0, flagcount = 0, status;
+        for (const item of saleRecord.items) {
+            if (item.quantity === item.returnedQuantity) {
+                flagcount++;
             }
+            itemcount++;
+        }
+        if (flagcount === itemcount) {
+            status = "CompleteReturn"
+        } else status = "Partial"
+
+        const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: status })
+        if (!salesReturnRecord) {
+            return req.error(404, "Status not found")
+        }
+        await UPDATE(Sales).set({ returnStatus_ID: salesReturnRecord.ID }).where({ ID: ID })
+
+
+    }
+
+
+    this.on('removeItemsFromShopping', async (req) => {
+        const { quantity } = req.data
+        const { ID } = req.params[1]; //salesitems id
+
+
+        const salesitem = await SELECT.one.from(SalesItems).where({ ID: ID })
+        if (quantity == null || quantity < 0 || quantity > salesitem.quantity) {
+            return req.error(400, "Quantity to be removed must be less than purchased/ remaining")
+        }
+        // req.info(`${salesitem.ID}`)
+        const parentsale = await SELECT.one.from(Sales).where({ ID: salesitem.parentSales_ID })
+
+        let purchasePayStatus = await SELECT.one.from(SalesPayStatus).where({ payStatus: "Paid" })
+        if (!purchasePayStatus) {
+            return req.error(404, "Status Not found")
+        }
+        if (parentsale.paymentStatus_ID === purchasePayStatus.ID) {
+            return req.error(404, "Purchase Paid. Cant Remove. Please Return")
+        }
+
+        let saleItemStatus = await SELECT.one.from(SalesItemStatus).where({ saleItStatus: 'Pay Pending' })
+        if (!saleItemStatus) {
+            return req.error(404, "Status Not found")
+        }
+        if (salesitem.itemStatus_ID !== saleItemStatus.ID) {
+            return req.error(400, "Item Already Paid. Cant remove. Return Instead")
+        }
+
+        if (salesitem.quantity === quantity) {
+            await DELETE.from(SalesItems).where({ ID: ID })
+        }
+        await UPDATE(SalesItems).set({ quantity: { '-=': quantity } }).where({ ID: ID })
+
+        req.info("Item Removed Accordingly")
+        await SELECT.one.from(SalesItems).where({ ID: ID })
 
     })
 });
