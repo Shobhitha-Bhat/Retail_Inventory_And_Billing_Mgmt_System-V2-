@@ -24,6 +24,15 @@
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "customer-manage": {
+          "semanticObject": "GR",
+          "action": "manage",
+          "title": "Good Receipts"
+        }
+      }
     }
   },
   "sap.ui": {

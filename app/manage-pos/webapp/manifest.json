@@ -24,6 +24,15 @@
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "customer-manage": {
+          "semanticObject": "PO",
+          "action": "manage",
+          "title": "Purchase orders"
+        }
+      }
     }
   },
   "sap.ui": {

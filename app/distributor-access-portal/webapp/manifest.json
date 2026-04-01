@@ -24,6 +24,16 @@
           "odataVersion": "4.01"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "customer-manage": {
+          "semanticObject": "DistributorPortal",
+          "action": "manage",
+          "title": "Distributotrs",
+          "subTitle": "Retail Shop Distributors"
+        }
+      }
     }
   },
   "sap.ui": {

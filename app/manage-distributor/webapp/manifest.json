@@ -24,6 +24,17 @@
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "customer-manage": {
+          "semanticObject": "MockDistributors",
+          "action": "manage",
+          "title": "Manage Distributotrs",
+          "subTitle": "Retail Shop Distributors",
+          "icon": "sap-icon://employee"
+        }
+      }
     }
   },
   "sap.ui": {

@@ -24,6 +24,17 @@
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "customer-manage": {
+          "semanticObject": "Customer",
+          "action": "manage",
+          "title": "Manage Customers",
+          "subTitle": "Retail Shop Customers",
+          "icon": "sap-icon://employee"
+        }
+      }
     }
   },
   "sap.ui": {

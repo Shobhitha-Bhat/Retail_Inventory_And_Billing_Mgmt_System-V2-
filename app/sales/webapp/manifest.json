@@ -24,6 +24,15 @@
           "odataVersion": "4.0"
         }
       }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "customer-manage": {
+          "semanticObject": "Sales",
+          "action": "manage",
+          "title": "Sales and Returns"
+        }
+      }
     }
   },
   "sap.ui": {
