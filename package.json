@@ -38,8 +38,10 @@
             ]
           },
           "carol": {
-      "roles": ["categorymanager"]
-    }
+            "roles": [
+              "categorymanager"
+            ]
+          }
         }
       }
     },
