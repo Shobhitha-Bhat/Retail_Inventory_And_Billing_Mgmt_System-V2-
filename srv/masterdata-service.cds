@@ -4,7 +4,6 @@ using {my.retailshop as db} from '../db/schema';
 service MasterDataService{
     entity Categories as projection on db.Categories
     actions{
-        @(requires:'categorymanager')
         action discontinueCategory() returns Categories;
         action continueCategory() returns Categories;
     }

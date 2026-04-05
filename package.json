@@ -23,26 +23,6 @@
     "requires": {
       "db": {
         "kind": "sqlite"
-      },
-      "auth": {
-        "kind": "mocked",
-        "users": {
-          "alice": {
-            "roles": [
-              "support"
-            ]
-          },
-          "bob": {
-            "roles": [
-              "admin"
-            ]
-          },
-          "carol": {
-            "roles": [
-              "categorymanager"
-            ]
-          }
-        }
       }
     },
     "log": {
