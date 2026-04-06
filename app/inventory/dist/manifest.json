@@ -1,0 +1,199 @@
+{
+	"_version": "1.81.0",
+	"sap.app": {
+		"id": "inventory",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.20.2",
+			"toolsId": "55ee2156-d85e-4782-804a-9fcc0b0b0ba2"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "/odata/v4/inventory/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "4.0"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"inventory-manage": {
+					"semanticObject": "inventory",
+					"action": "manage",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.145.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {},
+				"sap.f": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "inventory.i18n.i18n",
+					"supportedLocales": [
+						""
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties",
+				"settings": {
+					"supportedLocales": [
+						""
+					]
+				}
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {
+				"flexibleColumnLayout": {
+					"defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
+					"defaultThreeColumnLayoutType": "ThreeColumnsMidExpanded"
+				},
+				"routerClass": "sap.f.routing.Router"
+			},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "InventoryList",
+					"target": [
+						"InventoryList"
+					]
+				},
+				{
+					"pattern": "Inventory({key}):?query:",
+					"name": "InventoryObjectPage",
+					"target": [
+						"InventoryList",
+						"InventoryObjectPage"
+					]
+				}
+			],
+			"targets": {
+				"InventoryList": {
+					"type": "Component",
+					"id": "InventoryList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/Inventory",
+							"variantManagement": "Page",
+							"navigation": {
+								"Inventory": {
+									"detail": {
+										"route": "InventoryObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "ResponsiveTable"
+									}
+								}
+							},
+							"initialLoad": "Enabled"
+						}
+					},
+					"controlAggregation": "beginColumnPages",
+					"contextPattern": ""
+				},
+				"InventoryObjectPage": {
+					"type": "Component",
+					"id": "InventoryObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/Inventory"
+						}
+					},
+					"controlAggregation": "midColumnPages",
+					"contextPattern": "/Inventory({key})"
+				}
+			}
+		},
+		"rootView": {
+			"viewName": "sap.fe.templates.RootContainer.view.Fcl",
+			"type": "XML",
+			"async": true,
+			"id": "appRootView"
+		},
+		"flexBundle": false
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.fe": {
+		"app": {
+			"enableLazyLoading": true
+		}
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "retail_inventory_and_billing_mgmt_system_v2.service"
+	}
+}

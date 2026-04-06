@@ -21,16 +21,19 @@
         "type": "OData",
         "settings": {
           "annotations": [],
-          "odataVersion": "4.01"
+          "odataVersion": "4.0"
         }
       }
     },
     "crossNavigation": {
       "inbounds": {
-        "customer-manage": {
-          "semanticObject": "Retailledger",
+        "ledger-manage": {
+          "semanticObject": "ledger",
           "action": "manage",
-          "title": "Ledger"
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
         }
       }
     }
@@ -152,5 +155,9 @@
     "app": {
       "enableLazyLoading": true
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "retail_inventory_and_billing_mgmt_system_v2.service"
   }
 }

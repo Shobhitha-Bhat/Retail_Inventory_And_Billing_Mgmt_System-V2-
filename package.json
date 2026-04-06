@@ -4,6 +4,7 @@
   "description": "Welcome to your new CAP project.",
   "main": "index.js",
   "scripts": {
+    "start": "cds-serve",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-manage-customer": "cds watch --open managecustomer/index.html?sap-ui-xx-viewCache=false --livereload false",
     "watch-manage-distributor": "cds watch --open managedistributor/index.html?sap-ui-xx-viewCache=false --livereload false",
@@ -23,7 +24,16 @@
     "requires": {
       "db": {
         "kind": "sqlite"
-      }
+      },
+      "[production]": {
+        "db": {
+          "kind": "hana"
+        },
+        "auth": "xsuaa"
+      },
+      "html5-repo": true,
+      "destinations": true,
+      "workzone": true
     },
     "log": {
       "level": "error"
@@ -34,15 +44,18 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@cap-js/hana": "^2",
     "@cap-js/openapi": "^1.3.1",
     "@cap-js/sqlite": "^2.1.3",
     "@sap/cds": "^9.7.1",
+    "@sap/xssec": "^4",
     "pdfkit": "^0.18.0"
   },
   "workspaces": [
     "app/*"
   ],
   "devDependencies": {
+    "@sap/cds-dk": "^9",
     "cds-plugin-ui5": "^0.13.0"
   },
   "sapux": [

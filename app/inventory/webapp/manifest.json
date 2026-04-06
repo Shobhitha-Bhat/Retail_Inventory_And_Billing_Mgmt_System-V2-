@@ -27,10 +27,13 @@
     },
     "crossNavigation": {
       "inbounds": {
-        "customer-manage": {
-          "semanticObject": "Inventory",
+        "inventory-manage": {
+          "semanticObject": "inventory",
           "action": "manage",
-          "title": "Inventory"
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
         }
       }
     }
@@ -174,5 +177,9 @@
     "app": {
       "enableLazyLoading": true
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "retail_inventory_and_billing_mgmt_system_v2.service"
   }
 }

@@ -27,10 +27,13 @@
     },
     "crossNavigation": {
       "inbounds": {
-        "customer-manage": {
-          "semanticObject": "PO",
+        "purchaseOrders-manage": {
+          "semanticObject": "purchaseOrders",
           "action": "manage",
-          "title": "Purchase orders"
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
         }
       }
     }
@@ -185,5 +188,9 @@
     "app": {
       "enableLazyLoading": true
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "retail_inventory_and_billing_mgmt_system_v2.service"
   }
 }

@@ -30,3 +30,5 @@ db.sqlite-wal
 *.http
 
 *.csv
+
+mta_archives/

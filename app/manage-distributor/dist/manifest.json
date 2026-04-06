@@ -1,0 +1,177 @@
+{
+	"_version": "1.81.0",
+	"sap.app": {
+		"id": "managedistributor",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.20.2",
+			"toolsId": "21e27eb0-3dff-49de-b53e-fd30782c6fc1"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "/odata/v4/master-data/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "4.0"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"distributors-manage": {
+					"semanticObject": "distributors",
+					"action": "manage",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.145.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "managedistributor.i18n.i18n",
+					"supportedLocales": [
+						""
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties",
+				"settings": {
+					"supportedLocales": [
+						""
+					]
+				}
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "DistributorsList",
+					"target": "DistributorsList"
+				},
+				{
+					"pattern": "Distributors({key}):?query:",
+					"name": "DistributorsObjectPage",
+					"target": "DistributorsObjectPage"
+				}
+			],
+			"targets": {
+				"DistributorsList": {
+					"type": "Component",
+					"id": "DistributorsList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/Distributors",
+							"variantManagement": "Page",
+							"navigation": {
+								"Distributors": {
+									"detail": {
+										"route": "DistributorsObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "ResponsiveTable"
+									}
+								}
+							},
+							"initialLoad": "Enabled"
+						}
+					}
+				},
+				"DistributorsObjectPage": {
+					"type": "Component",
+					"id": "DistributorsObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/Distributors"
+						}
+					}
+				}
+			}
+		},
+		"flexBundle": false
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.fe": {
+		"app": {
+			"enableLazyLoading": true
+		}
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "retail_inventory_and_billing_mgmt_system_v2.service"
+	}
+}

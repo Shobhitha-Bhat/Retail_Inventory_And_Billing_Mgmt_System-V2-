@@ -1,0 +1,260 @@
+{
+	"_version": "1.81.0",
+	"sap.app": {
+		"id": "sales",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.20.2",
+			"toolsId": "938bceef-d761-4395-bad7-cee371c12947"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "/odata/v4/sales/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "4.0"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"sales-manage": {
+					"semanticObject": "sales",
+					"action": "manage",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.145.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {},
+				"sap.f": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "sales.i18n.i18n",
+					"supportedLocales": [
+						""
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties",
+				"settings": {
+					"supportedLocales": [
+						""
+					]
+				}
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "SalesList",
+					"target": [
+						"SalesList"
+					]
+				},
+				{
+					"pattern": "Sales({key}):?query:",
+					"name": "SalesObjectPage",
+					"target": "SalesObjectPage"
+				},
+				{
+					"pattern": "Sales({key})/items({itemsKey}):?query:",
+					"name": "Sales_itemsObjectPage",
+					"target": "Sales_itemsObjectPage"
+				},
+				{
+					"name": "SalesReturnsObjectPage",
+					"pattern": "SalesReturns({SalesReturnsKey}):?query:",
+					"target": "SalesReturnsObjectPage"
+				}
+			],
+			"targets": {
+				"SalesList": {
+					"type": "Component",
+					"id": "SalesList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/Sales",
+							"variantManagement": "Page",
+							"navigation": {
+								"Sales": {
+									"detail": {
+										"route": "SalesObjectPage"
+									}
+								},
+								"SalesReturns": {
+									"detail": {
+										"route": "SalesReturnsObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "ResponsiveTable"
+									},
+									"actions": {
+										"Payment": {
+											"text": "Payment/Return",
+											"menu": [
+												"DataFieldForAction::SalesService.payForPurchase",
+												"DataFieldForAction::SalesService.returnEntirePurchase"
+											]
+										}
+									}
+								}
+							},
+							"defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
+							"initialLoad": "Enabled",
+							"views": {
+								"paths": [
+									{
+										"key": "tableView",
+										"annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
+									},
+									{
+										"key": "tableView1",
+										"annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView1",
+										"entitySet": "SalesReturns"
+									}
+								]
+							}
+						}
+					}
+				},
+				"SalesObjectPage": {
+					"type": "Component",
+					"id": "SalesObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"contextPath": "/Sales",
+							"navigation": {
+								"items": {
+									"detail": {
+										"route": "Sales_itemsObjectPage"
+									}
+								}
+							},
+							"sectionLayout": "Page",
+							"editableHeaderContent": false,
+							"content": {
+								"header": {
+									"visible": true
+								}
+							}
+						}
+					}
+				},
+				"Sales_itemsObjectPage": {
+					"type": "Component",
+					"id": "Sales_itemsObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"contextPath": "/Sales/items",
+							"navigation": {},
+							"editableHeaderContent": false,
+							"content": {
+								"header": {
+									"visible": true
+								}
+							},
+							"sectionLayout": "Page"
+						}
+					}
+				},
+				"SalesReturnsObjectPage": {
+					"type": "Component",
+					"id": "SalesReturnsObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"navigation": {},
+							"contextPath": "/SalesReturns"
+						}
+					}
+				}
+			}
+		},
+		"flexBundle": false
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.fe": {
+		"app": {
+			"enableLazyLoading": true
+		}
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "retail_inventory_and_billing_mgmt_system_v2.service"
+	}
+}

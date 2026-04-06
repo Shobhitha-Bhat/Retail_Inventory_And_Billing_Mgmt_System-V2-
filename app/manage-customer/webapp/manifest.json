@@ -28,11 +28,12 @@
     "crossNavigation": {
       "inbounds": {
         "customer-manage": {
-          "semanticObject": "Customer",
+          "semanticObject": "customer",
           "action": "manage",
-          "title": "Manage Customers",
-          "subTitle": "Retail Shop Customers",
-          "icon": "sap-icon://employee"
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
         }
       }
     }
@@ -154,5 +155,9 @@
     "app": {
       "enableLazyLoading": true
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "retail_inventory_and_billing_mgmt_system_v2.service"
   }
 }
