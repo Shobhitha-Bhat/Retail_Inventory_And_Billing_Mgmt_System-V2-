@@ -35,6 +35,9 @@
 				"inventory-manage": {
 					"semanticObject": "inventory",
 					"action": "manage",
+					"title": "Inventory",
+					"subTitle": "Real-time stock tracking",
+					"icon": "sap-icon://inventory",
 					"signature": {
 						"parameters": {},
 						"additionalParameters": "allowed"

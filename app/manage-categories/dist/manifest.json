@@ -34,6 +34,9 @@
 			"inbounds": {
 				"categories-manage": {
 					"semanticObject": "categories",
+					"title": "Product Categories",
+					"subTitle": "Organization of Items by Catgory",
+					"icon": "sap-icon://product",
 					"action": "manager",
 					"signature": {
 						"parameters": {},

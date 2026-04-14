@@ -30,6 +30,9 @@
         "sales-manage": {
           "semanticObject": "sales",
           "action": "manage",
+          "title": "Sales Records",
+          "subTitle": "Transaction and Bill history",
+          "icon": "sap-icon://monitor-payments",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"

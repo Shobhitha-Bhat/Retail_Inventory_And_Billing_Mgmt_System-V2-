@@ -30,6 +30,9 @@
         "distributorPortal-manage": {
           "semanticObject": "distributorPortal",
           "action": "manage",
+          "title": "Distributors' POV Portal",
+          "subTitle": "Manage POs and GRs of Retail",
+          "icon": "sap-icon://group",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"

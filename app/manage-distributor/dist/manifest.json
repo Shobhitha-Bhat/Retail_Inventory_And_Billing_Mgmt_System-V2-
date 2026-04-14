@@ -35,6 +35,9 @@
 				"distributors-manage": {
 					"semanticObject": "distributors",
 					"action": "manage",
+					"title": "Vendor Management",
+					"subTitle": "Maintain Distributor Profiles",
+					"icon": "sap-icon://supplier",
 					"signature": {
 						"parameters": {},
 						"additionalParameters": "allowed"

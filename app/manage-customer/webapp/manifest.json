@@ -29,6 +29,9 @@
       "inbounds": {
         "customer-manage": {
           "semanticObject": "customer",
+          "title": "Customer Master",
+          "subTitle": "Manage profiles and loyalty data",
+          "icon": "sap-icon://add-employee",
           "action": "manage",
           "signature": {
             "parameters": {},

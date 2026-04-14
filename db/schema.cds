@@ -16,7 +16,7 @@ entity Categories : cuid, managed {
     //     ACTIVE;
     //     NO_MORE_SOLD;
     // };
-    status:Association to CategoryStatus;
+    status:Association to CategoryStatus default '5d9165e4-6374-4a0c-b4aa-c5a1330bee05';
 }
 
 entity CategoryStatus:cuid{
@@ -32,7 +32,7 @@ entity Items : cuid, managed {
     //     ACTIVE;
     //     DISCONTINUED;
     // };
-    status:Association to ItemStatus;
+    status:Association to ItemStatus default '7181a2e0-ba47-478a-adf2-6c49f8e8720d';
     itemBasePrice:Decimal(10,2);
     gstPercent    : Decimal(5, 2);
     totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));
@@ -82,7 +82,7 @@ entity PO : cuid, managed {
     //     Closed;
     //     Partial;        
     // }
-    status:Association to POStatus;
+    status:Association to POStatus default '08ea8f8f-db3c-4b63-b3a4-4885b55d4346';
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
     supplier : Association to MockDistributors;

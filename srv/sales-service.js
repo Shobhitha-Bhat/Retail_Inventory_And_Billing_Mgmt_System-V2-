@@ -114,15 +114,58 @@ module.exports = cds.service.impl(function () {
                 return req.error(400, `LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
             }
 
-            const totalCostPricePerUnit = (itemInfo.itemBasePrice + ((itemInfo.itemBasePrice * itemInfo.gstPercent) / 100))
-            item.sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * itemInfo.marginPercent / 100);
+            // const totalCostPricePerUnit = (itemInfo.itemBasePrice + ((itemInfo.itemBasePrice * itemInfo.gstPercent) / 100))
+            // item.sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * itemInfo.marginPercent / 100);
 
-            item.totalAmount = item.quantity * item.sellingPrice;
-            const discountAmt = (item.totalAmount * item.discountPercent) / 100;
-            item.totalPayableAmount = item.totalAmount - discountAmt;
-            billamount += item.totalPayableAmount;
+            // item.totalAmount = item.quantity * item.sellingPrice;
+            // const discountAmt = (item.totalAmount * item.discountPercent) / 100;
+            // item.totalPayableAmount = item.totalAmount - discountAmt;
+            // billamount += item.totalPayableAmount;
+
+            // FORCE NUMBERS: Use Number() to prevent string concatenation
+        // const basePrice = Number(itemInfo.itemBasePrice);
+        // const gst = Number(itemInfo.gstPercent);
+        // const margin = Number(itemInfo.marginPercent);
+        // const discount = Number(item.discountPercent || 0);
+
+        // const totalCostPricePerUnit = basePrice + (basePrice * gst / 100);
+        // item.sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * margin / 100);
+
+        // item.totalAmount = qty * item.sellingPrice;
+        // const discountAmt = (item.totalAmount * discount) / 100;
+        
+        // // Final item amount rounded to 2 decimals
+        // item.totalPayableAmount = Number((item.totalAmount - discountAmt).toFixed(2));
+
+        // // Math now works correctly
+        // billamount += item.totalPayableAmount;
+        // Use Number() to prevent that 'Invalid Number' string gluing bug
+        const basePrice = Number(itemInfo.itemBasePrice || 0);
+        const gst = Number(itemInfo.gstPercent || 0);
+        const margin = Number(itemInfo.marginPercent || 0);
+        const qty = Number(item.quantity || 0);
+        const discountPercent = Number(item.discountPercent || 0);
+
+        const totalCostPricePerUnit = basePrice + (basePrice * gst / 100);
+        const sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * margin / 100);
+
+        const totalAmount = qty * sellingPrice;
+        const discountAmt = (totalAmount * discountPercent) / 100;
+        
+        const totalPayableAmount = Number((totalAmount - discountAmt).toFixed(2));
+
+        // Update the individual item in the database/request
+        item.sellingPrice = sellingPrice;
+        item.totalAmount = totalAmount;
+        item.totalPayableAmount = totalPayableAmount;
+        
+        billamount += totalPayableAmount;
         }
-        req.data.billTotal = billamount;
+        // req.data.billTotal = billamount;
+
+        // req.data.billTotal = Number(billamount.toFixed(2));
+
+        req.data.billTotal = Number(billamount.toFixed(2));
     });
 
     this.on('checkStockAvailability', async (req) => {
@@ -215,17 +258,17 @@ module.exports = cds.service.impl(function () {
         const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
         let newBalance;
         if (transactionType === "CREDIT")
-            newBalance = previousBalance + item.totalPayableAmount;
+            newBalance = previousBalance + Number(item.totalPayableAmount);
         else if (transactionType === "DEBIT")
-            newBalance = previousBalance - item.totalPayableAmount;
+            newBalance = previousBalance - Number(item.totalPayableAmount);
 
 
 
         await INSERT.into(RetailLedger).entries({
             entryType_ID: debitRecord.ID,
             department_ID: deptRecord.ID,
-            amount: item.totalPayableAmount,
-            currentBalance: newBalance
+            amount: Number(item.totalPayableAmount),
+            currentBalance: Number(newBalance.toFixed(2))
         })
     }
 

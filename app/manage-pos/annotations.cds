@@ -114,36 +114,6 @@ annotate service.POItems with @(
             Target : '@UI.FieldGroup#ItemInformation1',
         },
     ],
-    UI.FieldGroup #ItemInformation : {
-        $Type : 'UI.FieldGroupType',
-        Data : [
-            {
-                $Type : 'UI.DataField',
-                Value : items.ID,
-                Label : 'ID',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : items.itemName,
-                Label : 'itemName',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : items.marginPercent,
-                Label : 'marginPercent',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : items.gstPercent,
-                Label : 'gstPercent',
-            },
-            {
-                $Type : 'UI.DataField',
-                Value : items.status,
-                Label : 'status',
-            },
-        ],
-    },
     UI.FieldGroup #ItemInformation1 : {
         $Type : 'UI.FieldGroupType',
         Data : [

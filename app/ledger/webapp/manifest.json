@@ -30,6 +30,9 @@
         "ledger-manage": {
           "semanticObject": "ledger",
           "action": "manage",
+          "title": "Financial Ledger",
+          "subTitle": "Running Balances and acounting logs",
+          "icon":"sap-icon://leads",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"

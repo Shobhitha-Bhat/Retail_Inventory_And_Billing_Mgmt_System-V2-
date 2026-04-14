@@ -30,6 +30,9 @@
         "purchaseOrders-manage": {
           "semanticObject": "purchaseOrders",
           "action": "manage",
+          "title": "POs Management",
+          "subTitle": "Manage New Stock Requests",
+          "icon": "sap-icon://request",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"
@@ -55,7 +58,7 @@
     }
   },
   "sap.ui5": {
-    "flexEnabled": true,
+    "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.145.0",
       "libs": {

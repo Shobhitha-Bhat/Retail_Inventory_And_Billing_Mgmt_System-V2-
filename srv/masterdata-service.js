@@ -64,6 +64,7 @@ module.exports = cds.service.impl(async function() {
             return req.error(404,'Item Not found in Inventory');
         }
 
+        //if not empty, tell to empty it first 
         if(inventory.quantity === 0){
             await UPDATE(Items).set({status_ID:statusRecord.ID}).where({ID:ID});
             return SELECT.one.from(Items).where({ ID: ID });
@@ -72,7 +73,6 @@ module.exports = cds.service.impl(async function() {
             return req.error(400,'Item INSTOCK. Cant be Discontinued')
         }
 
-        //if not empty, tell to empty it first 
     })
 
 
@@ -108,7 +108,7 @@ module.exports = cds.service.impl(async function() {
             return req.error(404,'PO not there')
         }
 
-        const grpayment = await SELECT.one.from('GRPaymentStatus').where({grPayStatus: 'PENDING'})
+        const grpayment = await SELECT.one.from('GRPaymentStatus').where({grPayStatus: 'Pending'})
         if(!grpayment){
             return req.error(404,"Status 'PENDING' not found")
         }

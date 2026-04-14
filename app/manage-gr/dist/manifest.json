@@ -35,6 +35,9 @@
 				"goodReceipts-manage": {
 					"semanticObject": "goodReceipts",
 					"action": "manage",
+					"title": "Good Receipt (GR)",
+					"subTitle": "Record Incoming Stocks and Deliveries",
+					"icon": "sap-icon://receipt",
 					"signature": {
 						"parameters": {},
 						"additionalParameters": "allowed"
