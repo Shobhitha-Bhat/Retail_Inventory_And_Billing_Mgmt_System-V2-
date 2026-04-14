@@ -196,7 +196,7 @@ module.exports = cds.service.impl(function () {
             contactNumber: contactNumber
         })
 
-        req.info("Customer Added. Proceed")
+        req.info("Customer Added. Proceed. auto deploy test ")
     })
 
     this.on('payForPurchase', async (req) => {
