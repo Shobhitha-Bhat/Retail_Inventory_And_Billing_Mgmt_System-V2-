@@ -182,11 +182,29 @@ module.exports = cds.service.impl(function () {
         const inventoryQuantity = await SELECT.one.from(Inventory).where({ inventoryItem_ID: salesItemsRecord.item_ID })
         if (!inventoryQuantity) {
             return req.error(404, "Item Not in Inventory")
+            await createPO(salesItemsRecord.item_ID);
         }
         if (salesItemsRecord.quantity > inventoryQuantity.quantity) {
             return req.error(400, `LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
+            await createPO(salesItemsRecord.item_ID);
         } else req.info("Available")
     })
+
+
+    
+async function createPO(inventoryItemId) {
+    await INSERT.into(PO).entries({
+        supplier_ID: "08ea8f8f-db3c-4b63-b3a4-4885b55d4346", // Use your supplier UUID here
+        poItems: [
+            {
+                poItem_ID: inventoryItemId,
+                quantity: 5
+                // itemsYetToReceive: 5 // Initializing this since it's not virtual
+            }
+        ]
+    });
+}
+
 
     this.on('addnewCustomer', async (req) => {
         const { customername, city, contactNumber } = req.data;

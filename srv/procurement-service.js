@@ -58,14 +58,14 @@ module.exports = function () {
 
 
     this.before('CREATE', 'PO', req => {
-    const po = req.data;
-    if (po.poItems) {
-        po.poItems.forEach(item => {
-            // When first creating, everything is "yet to receive"
-            item.itemsYetToReceive = item.quantity;
-        });
-    }
-});
+        const po = req.data;
+        if (po.poItems) {
+            po.poItems.forEach(item => {
+                // When first creating, everything is "yet to receive"
+                item.itemsYetToReceive = item.quantity;
+            });
+        }
+    });
 
     //to calculate total, paid and remaining amount == ony for frontend purpose. there are not stored in db
     // this.after('READ', 'PO', async (data, req) => {
@@ -99,45 +99,45 @@ module.exports = function () {
     //     }
     // })
     this.after('READ', 'PO', async (data, req) => {
-    const pos = Array.isArray(data) ? data : [data];
-    if (pos.length === 0) return;
+        const pos = Array.isArray(data) ? data : [data];
+        if (pos.length === 0) return;
 
-    // 1. Fetch all items and their master data prices in ONE go for all POs being read
-    const poIds = pos.map(p => p.ID);
-    const allItems = await SELECT.from(POItems).where({ parentPO_ID: { in: poIds } })
-        .columns(item => {
-            item('*'),
-            item.poItem(master => { master.itemBasePrice, master.gstPercent })
-        });
+        // 1. Fetch all items and their master data prices in ONE go for all POs being read
+        const poIds = pos.map(p => p.ID);
+        const allItems = await SELECT.from(POItems).where({ parentPO_ID: { in: poIds } })
+            .columns(item => {
+                item('*'),
+                    item.poItem(master => { master.itemBasePrice, master.gstPercent })
+            });
 
-    for (const po of pos) {
-        // Filter the pre-fetched items for this specific PO
-        const items = allItems.filter(i => i.parentPO_ID === po.ID);
+        for (const po of pos) {
+            // Filter the pre-fetched items for this specific PO
+            const items = allItems.filter(i => i.parentPO_ID === po.ID);
 
-        let total = 0, remaining = 0;
+            let total = 0, remaining = 0;
 
-        for (const item of items) {
-            const master = item.poItem;
-            if (master) {
-                const price = Number(master.itemBasePrice) || 0;
-                const gst = Number(master.gstPercent) || 0;
-                const qty = Number(item.quantity) || 0;
-                const yetToRcv = Number(item.itemsYetToReceive) || 0;
+            for (const item of items) {
+                const master = item.poItem;
+                if (master) {
+                    const price = Number(master.itemBasePrice) || 0;
+                    const gst = Number(master.gstPercent) || 0;
+                    const qty = Number(item.quantity) || 0;
+                    const yetToRcv = Number(item.itemsYetToReceive) || 0;
 
-                // Calculate unit price with tax first
-                const unitPriceWithTax = price + (price * gst / 100);
-                
-                total += qty * unitPriceWithTax;
-                remaining += yetToRcv * unitPriceWithTax;
+                    // Calculate unit price with tax first
+                    const unitPriceWithTax = price + (price * gst / 100);
+
+                    total += qty * unitPriceWithTax;
+                    remaining += yetToRcv * unitPriceWithTax;
+                }
             }
-        }
 
-        // Apply rounding ONLY at the very end to maintain accuracy
-        po.totalPOAmount = Number(total.toFixed(2));
-        po.remainingAmount = Number(remaining.toFixed(2));
-        po.paidAmount = Number((total - remaining).toFixed(2));
-    }
-});
+            // Apply rounding ONLY at the very end to maintain accuracy
+            po.totalPOAmount = Number(total.toFixed(2));
+            po.remainingAmount = Number(remaining.toFixed(2));
+            po.paidAmount = Number((total - remaining).toFixed(2));
+        }
+    });
 
 
     this.on('approvePO', async (req) => {
@@ -281,59 +281,59 @@ module.exports = function () {
     });
 
 
-// this.on('approveGR', async (req) => {
-//     const { ID } = req.params[0];
-//     const selectedGR = await SELECT.one.from(GR).where({ ID }).columns(g => { g('*'), g.grItems('*') });
+    // this.on('approveGR', async (req) => {
+    //     const { ID } = req.params[0];
+    //     const selectedGR = await SELECT.one.from(GR).where({ ID }).columns(g => { g('*'), g.grItems('*') });
 
-//     if (!selectedGR) return req.error(404, "GR not found");
+    //     if (!selectedGR) return req.error(404, "GR not found");
 
-//     // 1. FETCH ALL STATUSES ONCE (Move these out of the loop!)
-//     const [statAccepted, statReturned, statPartial] = await Promise.all([
-//         SELECT.one.from(GRStatus).where({ grStatus: 'Accepted' }),
-//         SELECT.one.from(GRStatus).where({ grStatus: 'Returned' }),
-//         SELECT.one.from(GRStatus).where({ grStatus: 'Partial Return' })
-//     ]);
-    
-//     const [payPaid, payPending, payPartial] = await Promise.all([
-//         SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Paid' }),
-//         SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Pending' }),
-//         SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Partially Paid' })
-//     ]);
+    //     // 1. FETCH ALL STATUSES ONCE (Move these out of the loop!)
+    //     const [statAccepted, statReturned, statPartial] = await Promise.all([
+    //         SELECT.one.from(GRStatus).where({ grStatus: 'Accepted' }),
+    //         SELECT.one.from(GRStatus).where({ grStatus: 'Returned' }),
+    //         SELECT.one.from(GRStatus).where({ grStatus: 'Partial Return' })
+    //     ]);
 
-//     const [poClosed, poOpen, poPartial] = await Promise.all([
-//         SELECT.one.from(POStatus).where({ poStatus: 'Closed' }),
-//         SELECT.one.from(POStatus).where({ poStatus: 'Open' }),
-//         SELECT.one.from(POStatus).where({ poStatus: 'Partial' })
-//     ]);
+    //     const [payPaid, payPending, payPartial] = await Promise.all([
+    //         SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Paid' }),
+    //         SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Pending' }),
+    //         SELECT.one.from(GRPaymentStatus).where({ grPayStatus: 'Partially Paid' })
+    //     ]);
 
-//     // Initialize logic variables
-//     let finalGrStatus = statAccepted, finalPayStatus = payPaid, finalPoStatus = poClosed;
+    //     const [poClosed, poOpen, poPartial] = await Promise.all([
+    //         SELECT.one.from(POStatus).where({ poStatus: 'Closed' }),
+    //         SELECT.one.from(POStatus).where({ poStatus: 'Open' }),
+    //         SELECT.one.from(POStatus).where({ poStatus: 'Partial' })
+    //     ]);
 
-//     // 2. RUN THE LOOP FOR DATA PROCESSING
-//     for (const gritem of selectedGR.grItems) {
-//         // Logic to determine overall status
-//         if (gritem.quantityDamaged > 0) {
-//             if (gritem.quantityDamaged === gritem.quantityReceived) {
-//                 finalGrStatus = statReturned; finalPayStatus = payPending; finalPoStatus = poOpen;
-//             } else {
-//                 finalGrStatus = statPartial; finalPayStatus = payPartial; finalPoStatus = poPartial;
-//             }
-//         }
+    //     // Initialize logic variables
+    //     let finalGrStatus = statAccepted, finalPayStatus = payPaid, finalPoStatus = poClosed;
 
-//         // Update individual PO Items
-//         const effectiveQty = (Number(gritem.quantityReceived) || 0) - (Number(gritem.quantityDamaged) || 0);
-//         await UPDATE(POItems).set({ itemsYetToReceive: { '-=': effectiveQty } }).where({ ID: gritem.poItem_ID });
-        
-//         await addToInventory(gritem, req);
-//         await updateLedger(gritem, req);
-//     }
+    //     // 2. RUN THE LOOP FOR DATA PROCESSING
+    //     for (const gritem of selectedGR.grItems) {
+    //         // Logic to determine overall status
+    //         if (gritem.quantityDamaged > 0) {
+    //             if (gritem.quantityDamaged === gritem.quantityReceived) {
+    //                 finalGrStatus = statReturned; finalPayStatus = payPending; finalPoStatus = poOpen;
+    //             } else {
+    //                 finalGrStatus = statPartial; finalPayStatus = payPartial; finalPoStatus = poPartial;
+    //             }
+    //         }
 
-//     // 3. UPDATE HEADERS ONCE (After the loop)
-//     await UPDATE(GR).set({ status_ID: finalGrStatus.ID, paymentStatus_ID: finalPayStatus.ID }).where({ ID });
-//     await UPDATE(PO).set({ status_ID: finalPoStatus.ID }).where({ ID: selectedGR.originalPO_ID });
+    //         // Update individual PO Items
+    //         const effectiveQty = (Number(gritem.quantityReceived) || 0) - (Number(gritem.quantityDamaged) || 0);
+    //         await UPDATE(POItems).set({ itemsYetToReceive: { '-=': effectiveQty } }).where({ ID: gritem.poItem_ID });
 
-//     return SELECT.one.from(GR).where({ ID });
-// });
+    //         await addToInventory(gritem, req);
+    //         await updateLedger(gritem, req);
+    //     }
+
+    //     // 3. UPDATE HEADERS ONCE (After the loop)
+    //     await UPDATE(GR).set({ status_ID: finalGrStatus.ID, paymentStatus_ID: finalPayStatus.ID }).where({ ID });
+    //     await UPDATE(PO).set({ status_ID: finalPoStatus.ID }).where({ ID: selectedGR.originalPO_ID });
+
+    //     return SELECT.one.from(GR).where({ ID });
+    // });
 
     this.on('approveGR', async (req) => {
         //when this button clicked,
@@ -364,8 +364,8 @@ module.exports = function () {
 
         grStatusRecord = await SELECT.one.from(GRStatus).where({ grStatus: 'StockRcvd_InspectionInProgress' });
         if (!grStatusRecord) return req.error(404, `Status ${status} not found`);
-        if(selectedGR.status_ID !== grStatusRecord.ID ){
-            return req.error(400,'GR Already Inspected & Approved')
+        if (selectedGR.status_ID !== grStatusRecord.ID) {
+            return req.error(400, 'GR Already Inspected & Approved')
         }
 
         const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
@@ -404,8 +404,8 @@ module.exports = function () {
 
         }
 
-await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
-            await UPDATE(PO).set({ status_ID: poStatusRecord.ID }).where({ ID: selectedGR.originalPO_ID })
+        await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
+        await UPDATE(PO).set({ status_ID: poStatusRecord.ID }).where({ ID: selectedGR.originalPO_ID })
         req.info("GR Appropriately Approved")
         req.info("Items Stocked | PO Statuses Updated | Ledger Updated")
         return SELECT.one.from(GR).where({ ID: ID });
@@ -434,13 +434,13 @@ await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPayment
 
         // let itemcostprice = (item.itemBasePrice + ((item.itemBasePrice * item.gstPercent) / 100));
         const basePrice = Number(item.itemBasePrice) || 0;
-    const gst = Number(item.gstPercent) || 0;
+        const gst = Number(item.gstPercent) || 0;
 
-    // 2. Perform the calculation safely
-    const rawCost = basePrice + ((basePrice * gst) / 100);
-    
-    // 3. Round it only after confirming rawCost is a valid number
-    let itemcostprice = !isNaN(rawCost) ? Number(rawCost.toFixed(2)) : 0;
+        // 2. Perform the calculation safely
+        const rawCost = basePrice + ((basePrice * gst) / 100);
+
+        // 3. Round it only after confirming rawCost is a valid number
+        let itemcostprice = !isNaN(rawCost) ? Number(rawCost.toFixed(2)) : 0;
         // let itemcostprice = Number((item.itemBasePrice + ((item.itemBasePrice * item.gstPercent) / 100)).toFixed(2));
 
         const existingStock = await SELECT.one.from(Inventory).where({ inventoryItem_ID: item.ID })
@@ -475,28 +475,28 @@ await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPayment
         }
 
         let itemcostprice = (Number(item.itemBasePrice) + ((Number(item.itemBasePrice) * Number(item.gstPercent)) / 100));
-        
+
         const deptRecord = await SELECT.one.from(Departments).where({ dept: 'PROCUREMENT' });
         if (!deptRecord) return req.error(400, 'Invalid Department');
-        
+
         const debitRecord = await SELECT.one.from(PassbookEntryTypes).where({ entryType: 'DEBIT' })
         if (!debitRecord) return req.error(400, 'DEBIT not found')
-            
-            const lastEntry = await SELECT.one.from(RetailLedger)
+
+        const lastEntry = await SELECT.one.from(RetailLedger)
             .columns('currentBalance')
             .orderBy('createdAt desc');
-            
+
         const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
         // let newBalance = previousBalance - (itemcostprice*(gritem.quantityReceived - gritem.quantityDamaged));
         let transactionAmount = Number((itemcostprice * (gritem.quantityReceived - gritem.quantityDamaged)).toFixed(2));
-    let newBalance = Number((previousBalance - transactionAmount).toFixed(2));
+        let newBalance = Number((previousBalance - transactionAmount).toFixed(2));
 
 
         await INSERT.into(RetailLedger).entries({
-            entryType_ID:debitRecord.ID,
-            department_ID:deptRecord.ID,
-            amount:transactionAmount,
-            currentBalance:newBalance
+            entryType_ID: debitRecord.ID,
+            department_ID: deptRecord.ID,
+            amount: transactionAmount,
+            currentBalance: newBalance
         })
 
     }
