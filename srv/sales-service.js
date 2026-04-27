@@ -214,7 +214,7 @@ async function createPO(inventoryItemId) {
             contactNumber: contactNumber
         })
 
-        req.info("Customer Added. Proceed. build deploy check")
+        req.info("Customer Added. Proceed. build deploy checkk")
     })
 
     this.on('payForPurchase', async (req) => {
