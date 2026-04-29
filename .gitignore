@@ -32,3 +32,5 @@ db.sqlite-wal
 *.csv
 
 mta_archives/
+# added by cds
+.cdsrc-private.json
