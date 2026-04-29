@@ -16,7 +16,7 @@ entity Categories : cuid, managed {
     //     ACTIVE;
     //     NO_MORE_SOLD;
     // };
-    status:Association to CategoryStatus default '5d9165e4-6374-4a0c-b4aa-c5a1330bee05';
+    status:Association to CategoryStatus default 'd3714616-fa9c-4990-8cde-368aa3b0048b';
 }
 
 entity CategoryStatus:cuid{
@@ -32,7 +32,7 @@ entity Items : cuid, managed {
     //     ACTIVE;
     //     DISCONTINUED;
     // };
-    status:Association to ItemStatus default '7181a2e0-ba47-478a-adf2-6c49f8e8720d';
+    status:Association to ItemStatus default '2724acae-7907-4992-9063-a2dbc2a611d3';
     itemBasePrice:Decimal(10,2);
     gstPercent    : Decimal(5, 2);
     totalCostprice:Decimal(10,2) = (itemBasePrice+((itemBasePrice*gstPercent)/100));
@@ -82,7 +82,7 @@ entity PO : cuid, managed {
     //     Closed;
     //     Partial;        
     // }
-    status:Association to POStatus default '08ea8f8f-db3c-4b63-b3a4-4885b55d4346';
+    status:Association to POStatus default 'd009d10c-9160-4c3c-8099-d5276875673e';
     poItems  : Composition of many POItems
                    on poItems.parentPO = $self;
     supplier : Association to MockDistributors;
@@ -194,8 +194,8 @@ entity Sales : cuid, managed {
     //     Partial;
     //     CompleteReturn;
     // }
-    paymentStatus:Association to SalesPayStatus default '78493af3-1732-450d-9970-ba53be69c9ac';
-    returnStatus:Association to SalesReturnStatus default '2caa2484-0788-48bd-b45b-9f14ba6f3dd8';
+    paymentStatus:Association to SalesPayStatus default 'd81b7d05-12c1-4f4a-95ac-a83f6885dbc1';
+    returnStatus:Association to SalesReturnStatus default '233c6b57-b1e1-4a3b-b834-739998e90b82';
     billTotal:Decimal(15,2) @Core.Computed;
 }
 
@@ -220,7 +220,7 @@ entity SalesItems : cuid, managed {
 
     quantity      : Integer;
     returnedQuantity:Integer default 0;
-    itemStatus:Association to SalesItemStatus default '131ce0ae-758d-4144-b92d-8bf61abbf9a9' ;
+    itemStatus:Association to SalesItemStatus default '61971924-d02e-4bcf-8fb8-97a3bbb344e0' ;
     sellingPrice  : Decimal(10, 2) @Core.Computed; // calculated using item information
     totalAmount   : Decimal(12, 2) @Core.Computed; //calculated using selling price and quantity
     discountPercent:Decimal(10,2) default 0.00;  //entered using filling form
