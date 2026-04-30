@@ -194,7 +194,7 @@ module.exports = cds.service.impl(function () {
     
 async function createPO(inventoryItemId) {
     await INSERT.into(PO).entries({
-        supplier_ID: "08ea8f8f-db3c-4b63-b3a4-4885b55d4346", // Use your supplier UUID here
+        supplier_ID: "ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec", // Use your supplier UUID here
         poItems: [
             {
                 poItem_ID: inventoryItemId,
