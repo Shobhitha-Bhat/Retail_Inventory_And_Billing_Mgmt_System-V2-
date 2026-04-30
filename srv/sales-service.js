@@ -181,29 +181,52 @@ module.exports = cds.service.impl(function () {
         }
         const inventoryQuantity = await SELECT.one.from(Inventory).where({ inventoryItem_ID: salesItemsRecord.item_ID })
         if (!inventoryQuantity) {
-            return req.error(404, "Item Not in Inventory")
-            await createPO(salesItemsRecord.item_ID);
+            await createPO(salesItemsRecord.item_ID, salesItemsRecord.quantity);
+            return req.warn(400, "Item Not in Inventory")
+            // await createPO(salesItemsRecord.item_ID);
         }
         if (salesItemsRecord.quantity > inventoryQuantity.quantity) {
-            return req.error(400, `LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
-            await createPO(salesItemsRecord.item_ID);
+            await createPO(salesItemsRecord.item_ID, salesItemsRecord.quantity);
+            return req.warn(400, `LOWSTOCK. Only ${inventoryQuantity.quantity} units available`)
+            // await createPO(salesItemsRecord.item_ID);
         } else req.info("Available")
     })
 
 
-    
-async function createPO(inventoryItemId) {
-    await INSERT.into(PO).entries({
-        supplier_ID: "ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec", // Use your supplier UUID here
+ const createPO = async (itemID, requestedQuantity) => {
+    console.log("Triggering Deep Insert for Auto-PO...");
+    const orderQuantity = requestedQuantity || 10;
+
+    // We insert the parent and children in one structured object
+    await INSERT.into('PO').entries({
+        status_ID: 'd009d10c-9160-4c3c-8099-d5276875673e',
+        supplier_ID: 'ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec',
+        // 'poItems' matches the Composition name in your CDS
         poItems: [
             {
-                poItem_ID: inventoryItemId,
-                quantity: 5
-                // itemsYetToReceive: 5 // Initializing this since it's not virtual
+                poItem_ID: itemID,
+                quantity: orderQuantity,
+                itemsYetToReceive: orderQuantity
             }
         ]
     });
-}
+
+    console.log(`Auto-PO and Items created successfully via Deep Insert.`);
+};
+
+    
+// async function createPO(inventoryItemId) {
+//     await INSERT.into(PO).entries({
+//         supplier_ID: "ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec", // Use your supplier UUID here
+//         poItems: [
+//             {
+//                 poItem_ID: inventoryItemId,
+//                 quantity: 5
+//                 // itemsYetToReceive: 5 // Initializing this since it's not virtual
+//             }
+//         ]
+//     });
+// }
 
 
     this.on('addnewCustomer', async (req) => {
