@@ -32,6 +32,11 @@ annotate FinanceService.RetailLedger with @(
             $Type : 'UI.DataField',
             Value : createdAt,
         },
+        {
+            $Type : 'UI.DataField',
+            Value : sequenceNum,
+            Label : 'sequenceNum',
+        },
     ],
     UI.Facets : [
         {

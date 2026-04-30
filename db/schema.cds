@@ -259,6 +259,7 @@ entity RetailLedger : cuid, managed {
     //     MISC;
     //     INVESTMENT; 
     // };
+    sequenceNum:Integer @Core.Computed;
     entryType:Association to PassbookEntryTypes;
     department:Association to Departments;
     amount       : Decimal(15, 2);

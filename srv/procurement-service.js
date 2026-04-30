@@ -369,7 +369,15 @@ module.exports = function () {
         }
 
         const grItemInspectStatus = await SELECT.one.from(GRItemInspectStatus).where({ inspectStatus: 'Inspected' });
-        if (!grItemInspectStatus) return req.error(404, `Status ${grItemInspectStatus} not found`)
+        if (!grItemInspectStatus) return req.error(404, `Status ${grItemInspectStatus} not found`);
+        
+                const lastEntry = await SELECT.one.from(RetailLedger)
+            .columns('currentBalance','sequenceNum')
+            .orderBy('sequenceNum desc');
+
+            let runningBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+            let nextSeq = lastEntry ? (Number(lastEntry.sequenceNum) + 1) : 1;
+
 
         for (const gritem of selectedGR.grItems) {
             if (gritem.inspectionStatus_ID !== grItemInspectStatus.ID) {
@@ -399,7 +407,9 @@ module.exports = function () {
             // await UPDATE(PO).set({ status_ID: poStatusRecord.ID }).where({ ID: selectedGR.originalPO_ID })
             await UPDATE(POItems).set({ itemsYetToReceive: { '-=': gritem.quantityReceived - gritem.quantityDamaged } }).where({ ID: gritem.poItem_ID })
             await addToInventory(gritem, req);
-            await updateLedger(gritem, req);
+            const result = await updateLedger(gritem, req, runningBalance,nextSeq);
+            runningBalance = result.newBalance;
+        nextSeq = result.nextSeq;
 
 
         }
@@ -463,7 +473,7 @@ module.exports = function () {
     }
 
 
-    async function updateLedger(gritem, req) {
+    async function updateLedger(gritem, req, previousBalance,currentSeq) {
         const poitem = await SELECT.one.from(POItems).where({ ID: gritem.poItem_ID })
         if (!poitem) {
             return req.error(404, "Requested POItem Not found")
@@ -482,22 +492,28 @@ module.exports = function () {
         const debitRecord = await SELECT.one.from(PassbookEntryTypes).where({ entryType: 'DEBIT' })
         if (!debitRecord) return req.error(400, 'DEBIT not found')
 
-        const lastEntry = await SELECT.one.from(RetailLedger)
-            .columns('currentBalance')
-            .orderBy('createdAt desc');
+        // const lastEntry = await SELECT.one.from(RetailLedger)
+        //     .columns('currentBalance')
+        //     .orderBy('createdAt desc');
+        // const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
 
-        const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
         // let newBalance = previousBalance - (itemcostprice*(gritem.quantityReceived - gritem.quantityDamaged));
         let transactionAmount = Number((itemcostprice * (gritem.quantityReceived - gritem.quantityDamaged)).toFixed(2));
         let newBalance = Number((previousBalance - transactionAmount).toFixed(2));
 
 
         await INSERT.into(RetailLedger).entries({
+            sequenceNum: currentSeq,
             entryType_ID: debitRecord.ID,
             department_ID: deptRecord.ID,
             amount: transactionAmount,
             currentBalance: newBalance
         })
+
+        return {
+        newBalance: newBalance,
+        nextSeq: currentSeq + 1 // Pass the next number back to the loop
+    };
 
     }
 }

@@ -17,12 +17,17 @@ module.exports = function(){
         if(!debitID) return req.error(400,'DEBIT not found')
 
         // 2. Fetch the latest running balance from the last persistent entry
-        const lastEntry = await SELECT.one.from(RetailLedger)
-            .columns('currentBalance')
-            .orderBy('createdAt desc');
+        // const lastEntry = await SELECT.one.from(RetailLedger)
+        //     .columns('currentBalance')
+        //     .orderBy('createdAt desc');
+
+            const lastEntry = await SELECT.one.from(RetailLedger)
+        .columns('currentBalance', 'sequenceNum')
+        .orderBy('sequenceNum desc', 'createdAt desc');
 
         const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
         const inputAmount = Number(amount) || 0;
+        const nextSeq = (lastEntry && lastEntry.sequenceNum) ? (Number(lastEntry.sequenceNum) + 1) : 1;
 
         // // 3. Apply business logic: PROCUREMENT/MISC (Minus), SALES/INVESTMENT (Plus)
         let newBalance ;
@@ -37,5 +42,6 @@ module.exports = function(){
 
         // 4. Inject the persistent balance into the request data
         req.data.currentBalance = Number(newBalance.toFixed(2));
+        req.data.sequenceNum = nextSeq;
     });
 }
