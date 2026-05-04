@@ -1,11 +1,16 @@
 using {my.retailshop as db} from '../db/schema';
 
-service FinanceService{
+service FinanceService @(requires: 'authenticated-user'){
 
-    //disable/hide Delete Edit Button
-    // @Capabilities.UpdateRestrictions.Updatable : false
-    // @Capabilities.DeleteRestrictions.Deletable : false
+    @(restrict: [
+        { grant: 'READ', to: 'Auditor' },
+        { grant: '*', to: 'FinanceManager' }
+    ])
     entity RetailLedger as projection on db.RetailLedger;
+
+    @readonly
     entity PassbookEntryTypes as projection on db.PassbookEntryTypes;
+    
+    @readonly
     entity Departments as projection on db.Departments;
 }

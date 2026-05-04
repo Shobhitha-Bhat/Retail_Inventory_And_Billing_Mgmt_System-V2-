@@ -1,10 +1,19 @@
 using {my.retailshop as db} from '../db/schema';
 
 service SalesService{
+    
+    @(restrict: [
+    { grant: 'READ', to: 'Auditor' },
+    { grant: '*',    to: 'SalesStaff' },
+    { grant: '*',    to: 'SalesManager' }
+])
     entity Sales as projection on db.Sales
     actions{
         action payForPurchase() returns Sales;
+
+        @(restrict: [{ to: 'SalesManager' }])
         action returnEntirePurchase() returns Sales;
+
         action generateInvoice() returns LargeBinary;
         action addnewCustomer(customername:String,city:String,contactNumber:String(20));
     }
@@ -23,6 +32,8 @@ service SalesService{
     actions{
         action checkStockAvailability();
         action removeItemsFromShopping(quantity:Integer) returns SalesItems;    //before paying for a purchase
+        
+        @(restrict: [{ to: 'SalesManager' }])
         action returnItems(quantity:Integer) returns SalesItems;               // after paying 
     }
 

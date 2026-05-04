@@ -8,7 +8,9 @@
     { "name": "$XSAPPNAME.SalesManager", "description": "Manage all Sales" },
     { "name": "$XSAPPNAME.Auditor", "description": "Read-only access to everything" },
     { "name": "$XSAPPNAME.Distributor", "description": "Access for external distributors" },
-    { "name": "$XSAPPNAME.ProductManager", "description": "Manage product catalog" }
+    { "name": "$XSAPPNAME.ProductManager", "description": "Manage product catalog" },
+    { "name": "$XSAPPNAME.SystemAdmin", "description": "System Administrator" },
+    { "name": "$XSAPPNAME.FinanceManager", "description": "Manage Accounts" }
   ],
   "attributes": [
   ],
@@ -47,6 +49,16 @@
       "name": "Distributor_Role",
       "description": "Role for specific third-party distributors",
       "scope-references": [ "$XSAPPNAME.Distributor" ]
+    },
+    {
+      "name": "SystemAdmin_Role",
+      "description": "System Administrator",
+      "scope-references": [ "$XSAPPNAME.SystemAdmin" ]
+    },
+    {
+      "name": "FinanceManager_Role",
+      "description": "Manage Accounts",
+      "scope-references": [ "$XSAPPNAME.FinanceManager" ]
     }
   ]
 }

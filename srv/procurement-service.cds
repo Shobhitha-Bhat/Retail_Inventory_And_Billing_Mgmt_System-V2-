@@ -14,9 +14,15 @@ service ProcurementService {
     entity PassbookEntryTypes as projection on db.PassbookEntryTypes;
     entity Departments as projection on db.Departments;
 
+@(restrict: [
+    { grant: 'READ', to: 'Auditor' },
+    { grant: '*',    to: 'POStaff' },
+    { grant: '*',    to: 'POManager' }
+])
     entity PO  as projection on db.PO 
         actions {
             // action approvePO() returns PO;
+            @(restrict: [{ to: 'POManager' }])
             action approvePO() returns PO;
             action closePO()   returns PO;
             action openPO()    returns PO;
@@ -26,14 +32,25 @@ service ProcurementService {
     entity POItems as projection on db.POItems as POI;
 
 
+@(restrict: [
+    { grant: 'READ', to: 'Auditor' },
+    { grant: 'READ',    to: 'POStaff' },
+    { grant: '*',    to: 'POManager' }
+])
     entity GR as projection on db.GR
         actions {
+            @(restrict: [{ to: 'POManager' }])
             action approveGR() returns GR;
         }
 
     entity GRStatus as projection on db.GRStatus;
     entity GRItems as projection on db.GRItems
         actions {
+            @(restrict: [
+    { grant: 'READ', to: 'Auditor' },
+    { grant: '*',    to: 'POStaff' },
+    { grant: '*',    to: 'POManager' }
+])
             action markInspected(quantityDamaged: Integer) returns GRItems;
         }
 
