@@ -1,5 +1,58 @@
 {
-  "scopes": [],
-  "attributes": [],
-  "role-templates": []
+  "xsappname": "retail_inventory_and_billing_mgmt_system_v2",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    { "name": "$XSAPPNAME.POStaff", "description": "Create and view POs" },
+    { "name": "$XSAPPNAME.POManager", "description": "Manage and approve POs" },
+    { "name": "$XSAPPNAME.SalesStaff", "description": "Create Sales Orders" },
+    { "name": "$XSAPPNAME.SalesManager", "description": "Manage all Sales" },
+    { "name": "$XSAPPNAME.Auditor", "description": "Read-only access to everything" },
+    { "name": "$XSAPPNAME.Distributor", "description": "Access for external distributors" },
+    { "name": "$XSAPPNAME.ProductManager", "description": "Manage product catalog" }
+  ],
+  "attributes": [
+    {
+      "name": "distributor_id",
+      "description": "Unique ID for the distributor",
+      "valueType": "string"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "PO_Staff_Role",
+      "description": "Staff role for PO processing",
+      "scope-references": [ "$XSAPPNAME.POStaff" ]
+    },
+    {
+      "name": "PO_Manager_Role",
+      "description": "Manager role for PO approval",
+      "scope-references": [ "$XSAPPNAME.POManager" ]
+    },
+    {
+      "name": "Sales_Staff_Role",
+      "description": "Front-desk sales and billing",
+      "scope-references": [ "$XSAPPNAME.SalesStaff" ]
+    },
+    {
+      "name": "Sales_Manager_Role",
+      "description": "Sales oversight and reporting",
+      "scope-references": [ "$XSAPPNAME.SalesManager" ]
+    },
+    {
+      "name": "Product_Manager_Role",
+      "description": "Inventory and Catalog management",
+      "scope-references": [ "$XSAPPNAME.ProductManager" ]
+    },
+    {
+      "name": "Auditor_Role",
+      "description": "External or Internal Auditor (Read Only)",
+      "scope-references": [ "$XSAPPNAME.Auditor" ]
+    },
+    {
+      "name": "Distributor_Role",
+      "description": "Role for specific third-party distributors",
+      "scope-references": [ "$XSAPPNAME.Distributor" ],
+      "attribute-references": [ "distributor_id" ]
+    }
+  ]
 }

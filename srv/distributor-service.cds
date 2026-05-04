@@ -24,11 +24,24 @@ using {my.retailshop as db} from '../db/schema';
 service DistributorService{
     entity GRItems as projection on db.GRItems;
     entity MockDistributors as projection on db.MockDistributors;
+
+     @(restrict: [
+        { 
+            grant: '*', 
+            to: 'Distributor', 
+            where: 'distributor_id = $user.distributor_id' 
+        },
+        { 
+            grant: ['READ'], 
+            to: 'Auditor' 
+        }
+    ])
     entity IndependentDistributor as projection on db.IndependentDistributor
     actions{
         action triggerGRtoRetailer() returns IndependentDistributor;
         action closeRequest() returns IndependentDistributor;
     }
+
     entity DistributorOrderItems as projection on db.DistributorOrderItems as DOI;
     // {
     //         *,
