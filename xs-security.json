@@ -11,11 +11,6 @@
     { "name": "$XSAPPNAME.ProductManager", "description": "Manage product catalog" }
   ],
   "attributes": [
-    {
-      "name": "distributor_id",
-      "description": "Unique ID for the distributor",
-      "valueType": "string"
-    }
   ],
   "role-templates": [
     {
@@ -51,8 +46,7 @@
     {
       "name": "Distributor_Role",
       "description": "Role for specific third-party distributors",
-      "scope-references": [ "$XSAPPNAME.Distributor" ],
-      "attribute-references": [ "distributor_id" ]
+      "scope-references": [ "$XSAPPNAME.Distributor" ]
     }
   ]
 }
