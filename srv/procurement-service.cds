@@ -1,6 +1,6 @@
 using {my.retailshop as db} from '../db/schema';
 
-service ProcurementService {
+service ProcurementService @(requires: ['authenticated-user','Auditor','POManager','POStaff']){
 
     entity Distributors        as projection on db.MockDistributors;
     entity Items               as projection on db.Items;

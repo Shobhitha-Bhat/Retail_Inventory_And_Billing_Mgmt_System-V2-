@@ -1,6 +1,6 @@
 using {my.retailshop as db} from '../db/schema';
 
-service FinanceService @(requires: 'authenticated-user'){
+service FinanceService @(requires: ['authenticated-user','Auditor','FinanceManager']){
 
     @(restrict: [
         { grant: 'READ', to: 'Auditor' },

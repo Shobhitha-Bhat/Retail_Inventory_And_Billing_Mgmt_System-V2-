@@ -21,7 +21,7 @@ using {my.retailshop as db} from '../db/schema';
 //     }
 // }
 
-service DistributorService @(requires: 'authenticated-user'){
+service DistributorService @(requires: ['authenticated-user','Distributor']){
     entity GRItems as projection on db.GRItems;
     entity MockDistributors as projection on db.MockDistributors;
 

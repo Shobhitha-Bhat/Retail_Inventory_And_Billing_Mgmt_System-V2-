@@ -1,6 +1,6 @@
 using {my.retailshop as db} from '../db/schema';
 
-service SalesService{
+service SalesService @(requires: ['authenticated-user','Auditor','SalesManager','SalesStaff']){
     
     @(restrict: [
     { grant: 'READ', to: 'Auditor' },
