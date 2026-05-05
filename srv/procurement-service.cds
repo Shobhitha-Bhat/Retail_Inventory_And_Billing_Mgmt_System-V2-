@@ -16,7 +16,7 @@ service ProcurementService {
 
 @(restrict: [
     { grant: 'READ', to: 'Auditor' },
-    { grant: '*',    to: 'POStaff' },
+    { grant: ['READ', 'CREATE', 'UPDATE', 'DELETE', 'closePO', 'openPO'],    to: 'POStaff' },
     { grant: '*',    to: 'POManager' }
 ])
     entity PO  as projection on db.PO 
