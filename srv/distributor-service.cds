@@ -30,10 +30,6 @@ service DistributorService @(requires: 'authenticated-user'){
             grant: '*', 
             to: 'Distributor', 
             // where: 'distributor_id = $user.distributor_id' 
-        },
-        { 
-            grant: ['READ'], 
-            to: 'Auditor' 
         }
     ])
     entity IndependentDistributor as projection on db.IndependentDistributor

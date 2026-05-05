@@ -4,7 +4,7 @@ service SalesService{
     
     @(restrict: [
     { grant: 'READ', to: 'Auditor' },
-    { grant: '*',    to: 'SalesStaff' },
+    { grant: ['READ', 'CREATE', 'UPDATE', 'DELETE', 'generateInvoice', 'addnewCustomer','checkStockAvailability','removeItemsFromShopping'],    to: 'SalesStaff' },
     { grant: '*',    to: 'SalesManager' }
 ])
     entity Sales as projection on db.Sales
