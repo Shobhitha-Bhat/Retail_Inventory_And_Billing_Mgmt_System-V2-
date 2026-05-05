@@ -1,10 +1,11 @@
 using {my.retailshop as db} from '../db/schema';
 
 
-service MasterDataService   @(restrict: [
+service MasterDataService @(requires: ['authenticated-user','Auditor','ProductManager']) {
+@(restrict: [
     { grant: 'READ', to: 'Auditor' },
     { grant: '*',    to: 'ProductManager' }
-]){
+])
     entity Categories as projection on db.Categories
     actions{
         action discontinueCategory() returns Categories;
