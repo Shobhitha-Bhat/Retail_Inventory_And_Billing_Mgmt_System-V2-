@@ -3,7 +3,7 @@ using {my.retailshop as db} from '../db/schema';
 
 service MasterDataService   @(restrict: [
     { grant: 'READ', to: 'Auditor' },
-    { grant: '*',    to: 'ProductManager' }
+    { grant: '*',    to: 'Product_Manager_Role' }
 ]){
     entity Categories as projection on db.Categories
     actions{
