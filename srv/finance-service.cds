@@ -1,10 +1,11 @@
 using {my.retailshop as db} from '../db/schema';
 
-service FinanceService @(requires: ['authenticated-user','Auditor','FinanceManager']){
+service FinanceService @(requires: ['authenticated-user','Auditor','FinanceManager','SystemAdmin']){
 
     @(restrict: [
         { grant: 'READ', to: 'Auditor' },
-        { grant: '*', to: 'FinanceManager' }
+        { grant: '*', to: 'FinanceManager' },
+        {grant:'*',to:'SystemAdmin'}
     ])
     entity RetailLedger as projection on db.RetailLedger;
 

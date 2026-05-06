@@ -1,17 +1,21 @@
 using {my.retailshop as db} from '../db/schema';
 
-service SalesService @(requires: ['authenticated-user','Auditor','SalesManager','SalesStaff']){
+service SalesService @(requires: ['authenticated-user','Auditor','SalesManager','SalesStaff','SystemAdmin']){
     
     @(restrict: [
     { grant: 'READ', to: 'Auditor' },
     { grant: ['READ', 'CREATE', 'UPDATE', 'DELETE', 'generateInvoice', 'addnewCustomer','checkStockAvailability','removeItemsFromShopping'],    to: 'SalesStaff' },
-    { grant: '*',    to: 'SalesManager' }
+    { grant: '*',    to: 'SalesManager' },
+    {
+            grant:'*',
+            to:'SystemAdmin'
+        }
 ])
     entity Sales as projection on db.Sales
     actions{
         action payForPurchase() returns Sales;
 
-        @(restrict: [{ to: 'SalesManager' }])
+        @(restrict: [{ to: 'SalesManager' },{to: 'SystemAdmin'}])
         action returnEntirePurchase() returns Sales;
 
         action generateInvoice() returns LargeBinary;
@@ -33,7 +37,7 @@ service SalesService @(requires: ['authenticated-user','Auditor','SalesManager',
         action checkStockAvailability();
         action removeItemsFromShopping(quantity:Integer) returns SalesItems;    //before paying for a purchase
         
-        @(restrict: [{ to: 'SalesManager' }])
+        @(restrict: [{ to: 'SalesManager' },{to: 'SystemAdmin'}])
         action returnItems(quantity:Integer) returns SalesItems;               // after paying 
     }
 
