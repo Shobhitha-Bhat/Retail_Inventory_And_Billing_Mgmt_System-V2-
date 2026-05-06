@@ -472,8 +472,9 @@ module.exports = cds.service.impl(function () {
 
 
         const salesitem = await SELECT.one.from(SalesItems).where({ ID: ID })
-        if (quantity == null || quantity < 0 || quantity > (salesitem.quantity - salesitem.returnedQuantity)) {
-            return req.error(400, "Quantity to be returned must be less than purchased/ remaining")
+        if (quantity == null || quantity < 0 || quantity===0 || quantity > (salesitem.quantity - salesitem.returnedQuantity)) {
+            // return req.error(400, "Quantity to be returned must be less than purchased/ remaining")
+            return req.error(400, "Enter Valid Quantity")
         }
         // req.info(`${salesitem.ID}`)
         const parentsale = await SELECT.one.from(Sales).where({ ID: salesitem.parentSales_ID })
@@ -583,7 +584,7 @@ module.exports = cds.service.impl(function () {
             itemcount++;
         }
         if (flagcount === itemcount) {
-            status = "CompleteReturn"
+            status = "Complete Return"
         } else status = "Partial"
 
         const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: status })
@@ -602,8 +603,9 @@ module.exports = cds.service.impl(function () {
 
 
         const salesitem = await SELECT.one.from(SalesItems).where({ ID: ID })
-        if (quantity == null || quantity < 0 || quantity > salesitem.quantity) {
-            return req.error(400, "Quantity to be removed must be less than purchased/ remaining")
+        if (quantity == null || quantity < 0 || quantity===0 || quantity > salesitem.quantity) {
+            // return req.error(400, "Quantity to be removed must be less than purchased/ remaining")
+            return req.error(400, "Enter Valid Quantity")
         }
         // req.info(`${salesitem.ID}`)
         const parentsale = await SELECT.one.from(Sales).where({ ID: salesitem.parentSales_ID })
