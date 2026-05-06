@@ -426,7 +426,7 @@ module.exports = cds.service.impl(function () {
 
     })
 
-    async function updateLedgerForPartialItemReturn(item, req, department, transactionType,previousBalance,currentSeq) {
+    async function updateLedgerForPartialItemReturn(item, req, department, transactionType, previousBalance, currentSeq) {
         const deptRecord = await SELECT.one.from(Departments).where({ dept: department });
         if (!deptRecord) return req.error(400, 'Invalid Department');
 
@@ -442,11 +442,11 @@ module.exports = cds.service.impl(function () {
 
 
         // let transactionAmount = Number((itemcostprice * (gritem.quantityReceived - gritem.quantityDamaged)).toFixed(2));
-        
+
         if (transactionType === "CREDIT") {
             amountToLog = item.totalPayableAmount
             // newBalance = previousBalance + amountToLog;
-             newBalance = Number((previousBalance + amountToLog).toFixed(2));
+            newBalance = Number((previousBalance + amountToLog).toFixed(2));
         }
         else if (transactionType === "DEBIT") {
             amountToLog = (item.totalPayableAmount / item.quantity) * req.data.quantity
@@ -460,10 +460,10 @@ module.exports = cds.service.impl(function () {
             amount: amountToLog,
             currentBalance: newBalance
         })
-         return {
-        newBalance: newBalance,
-        nextSeq: currentSeq + 1 // Pass the next number back to the loop
-    };
+        return {
+            newBalance: newBalance,
+            nextSeq: currentSeq + 1 // Pass the next number back to the loop
+        };
     }
 
     this.on('returnItems', async (req) => {
@@ -472,7 +472,7 @@ module.exports = cds.service.impl(function () {
 
 
         const salesitem = await SELECT.one.from(SalesItems).where({ ID: ID })
-        if (quantity == null || quantity < 0 || quantity===0 || quantity > (salesitem.quantity - salesitem.returnedQuantity)) {
+        if (quantity == null || quantity < 0 || quantity === 0 || quantity > (salesitem.quantity - salesitem.returnedQuantity)) {
             // return req.error(400, "Quantity to be returned must be less than purchased/ remaining")
             return req.error(400, "Enter Valid Quantity")
         }
@@ -510,16 +510,16 @@ module.exports = cds.service.impl(function () {
         if (quantity == (salesitem.quantity - salesitem.returnedQuantity)) {
             status = 'Full Return'
             await updateInventory(salesitem, req, status)
-            const result = await updateLedger(salesitem, req, "SALES", "DEBIT",runningBalance,nextSeq);
+            const result = await updateLedger(salesitem, req, "SALES", "DEBIT", runningBalance, nextSeq);
             runningBalance = result.newBalance;
-        nextSeq = result.nextSeq;
-        } 
+            nextSeq = result.nextSeq;
+        }
         else if (quantity < (salesitem.quantity - salesitem.returnedQuantity)) {
             status = 'Partial Return'
             await updateInventory(salesitem, req, status)
-            const result = await updateLedgerForPartialItemReturn(salesitem, req, "SALES", "DEBIT",runningBalance,nextSeq);
+            const result = await updateLedgerForPartialItemReturn(salesitem, req, "SALES", "DEBIT", runningBalance, nextSeq);
             runningBalance = result.newBalance;
-        nextSeq = result.nextSeq;
+            nextSeq = result.nextSeq;
         }
 
 
@@ -603,7 +603,7 @@ module.exports = cds.service.impl(function () {
 
 
         const salesitem = await SELECT.one.from(SalesItems).where({ ID: ID })
-        if (quantity == null || quantity < 0 || quantity===0 || quantity > salesitem.quantity) {
+        if (quantity == null || quantity < 0 || quantity === 0 || quantity > salesitem.quantity) {
             // return req.error(400, "Quantity to be removed must be less than purchased/ remaining")
             return req.error(400, "Enter Valid Quantity")
         }
@@ -626,12 +626,26 @@ module.exports = cds.service.impl(function () {
             return req.error(400, "Item Already Paid. Cant remove. Return Instead")
         }
 
+        const newQuantity = salesitem.quantity - quantity;
         if (salesitem.quantity === quantity) {
             await DELETE.from(SalesItems).where({ ID: ID })
+        } else {
+            const newTotalAmount = salesitem.sellingPrice * newQuantity;
+            const discountAmount = (newTotalAmount * salesitem.discountPercent) / 100;
+            const newPayableAmount = newTotalAmount - discountAmount;
+            await UPDATE(SalesItems).set({
+                quantity: { '-=': quantity }, totalAmount: newTotalAmount,
+                totalPayableAmount: newPayableAmount
+            }).where({ ID: ID })
         }
-        await UPDATE(SalesItems).set({ quantity: { '-=': quantity } }).where({ ID: ID })
 
-        req.info("Item Removed Accordingly")
+        // req.info("Item Removed Accordingly")
+        const remainingItems = await SELECT.from(SalesItems).where({ parentSales_ID: parentSales_ID });
+    const newBillTotal = remainingItems.reduce((acc, item) => acc + Number(item.totalPayableAmount), 0);
+
+    await UPDATE(Sales).set({ billTotal: newBillTotal }).where({ ID: parentSales_ID });
+
+    req.info("Item removed and totals recalculated.");
         await SELECT.one.from(SalesItems).where({ ID: ID })
 
     })
