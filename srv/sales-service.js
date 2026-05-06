@@ -640,7 +640,7 @@ module.exports = cds.service.impl(function () {
         }
 
         // req.info("Item Removed Accordingly")
-        const remainingItems = await SELECT.from(SalesItems).where({ parentSales_ID: parentSales_ID });
+        const remainingItems = await SELECT.from(SalesItems).where({ parentSales_ID: parentsale.ID });
     const newBillTotal = remainingItems.reduce((acc, item) => acc + Number(item.totalPayableAmount), 0);
 
     await UPDATE(Sales).set({ billTotal: newBillTotal }).where({ ID: parentSales_ID });
