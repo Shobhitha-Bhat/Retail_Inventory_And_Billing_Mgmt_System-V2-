@@ -123,43 +123,43 @@ module.exports = cds.service.impl(function () {
             // billamount += item.totalPayableAmount;
 
             // FORCE NUMBERS: Use Number() to prevent string concatenation
-        // const basePrice = Number(itemInfo.itemBasePrice);
-        // const gst = Number(itemInfo.gstPercent);
-        // const margin = Number(itemInfo.marginPercent);
-        // const discount = Number(item.discountPercent || 0);
+            // const basePrice = Number(itemInfo.itemBasePrice);
+            // const gst = Number(itemInfo.gstPercent);
+            // const margin = Number(itemInfo.marginPercent);
+            // const discount = Number(item.discountPercent || 0);
 
-        // const totalCostPricePerUnit = basePrice + (basePrice * gst / 100);
-        // item.sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * margin / 100);
+            // const totalCostPricePerUnit = basePrice + (basePrice * gst / 100);
+            // item.sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * margin / 100);
 
-        // item.totalAmount = qty * item.sellingPrice;
-        // const discountAmt = (item.totalAmount * discount) / 100;
-        
-        // // Final item amount rounded to 2 decimals
-        // item.totalPayableAmount = Number((item.totalAmount - discountAmt).toFixed(2));
+            // item.totalAmount = qty * item.sellingPrice;
+            // const discountAmt = (item.totalAmount * discount) / 100;
 
-        // // Math now works correctly
-        // billamount += item.totalPayableAmount;
-        // Use Number() to prevent that 'Invalid Number' string gluing bug
-        const basePrice = Number(itemInfo.itemBasePrice || 0);
-        const gst = Number(itemInfo.gstPercent || 0);
-        const margin = Number(itemInfo.marginPercent || 0);
-        const qty = Number(item.quantity || 0);
-        const discountPercent = Number(item.discountPercent || 0);
+            // // Final item amount rounded to 2 decimals
+            // item.totalPayableAmount = Number((item.totalAmount - discountAmt).toFixed(2));
 
-        const totalCostPricePerUnit = basePrice + (basePrice * gst / 100);
-        const sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * margin / 100);
+            // // Math now works correctly
+            // billamount += item.totalPayableAmount;
+            // Use Number() to prevent that 'Invalid Number' string gluing bug
+            const basePrice = Number(itemInfo.itemBasePrice || 0);
+            const gst = Number(itemInfo.gstPercent || 0);
+            const margin = Number(itemInfo.marginPercent || 0);
+            const qty = Number(item.quantity || 0);
+            const discountPercent = Number(item.discountPercent || 0);
 
-        const totalAmount = qty * sellingPrice;
-        const discountAmt = (totalAmount * discountPercent) / 100;
-        
-        const totalPayableAmount = Number((totalAmount - discountAmt).toFixed(2));
+            const totalCostPricePerUnit = basePrice + (basePrice * gst / 100);
+            const sellingPrice = totalCostPricePerUnit + (totalCostPricePerUnit * margin / 100);
 
-        // Update the individual item in the database/request
-        item.sellingPrice = sellingPrice;
-        item.totalAmount = totalAmount;
-        item.totalPayableAmount = totalPayableAmount;
-        
-        billamount += totalPayableAmount;
+            const totalAmount = qty * sellingPrice;
+            const discountAmt = (totalAmount * discountPercent) / 100;
+
+            const totalPayableAmount = Number((totalAmount - discountAmt).toFixed(2));
+
+            // Update the individual item in the database/request
+            item.sellingPrice = sellingPrice;
+            item.totalAmount = totalAmount;
+            item.totalPayableAmount = totalPayableAmount;
+
+            billamount += totalPayableAmount;
         }
         // req.data.billTotal = billamount;
 
@@ -193,40 +193,40 @@ module.exports = cds.service.impl(function () {
     })
 
 
- const createPO = async (itemID, requestedQuantity) => {
-    console.log("Triggering Deep Insert for Auto-PO...");
-    const orderQuantity = requestedQuantity || 10;
+    const createPO = async (itemID, requestedQuantity) => {
+        console.log("Triggering Deep Insert for Auto-PO...");
+        const orderQuantity = requestedQuantity || 10;
 
-    // We insert the parent and children in one structured object
-    await INSERT.into('PO').entries({
-        status_ID: 'd009d10c-9160-4c3c-8099-d5276875673e',
-        supplier_ID: 'ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec',
-        // 'poItems' matches the Composition name in your CDS
-        poItems: [
-            {
-                poItem_ID: itemID,
-                quantity: orderQuantity,
-                itemsYetToReceive: orderQuantity
-            }
-        ]
-    });
+        // We insert the parent and children in one structured object
+        await INSERT.into('PO').entries({
+            status_ID: 'd009d10c-9160-4c3c-8099-d5276875673e',
+            supplier_ID: 'ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec',
+            // 'poItems' matches the Composition name in your CDS
+            poItems: [
+                {
+                    poItem_ID: itemID,
+                    quantity: orderQuantity,
+                    itemsYetToReceive: orderQuantity
+                }
+            ]
+        });
 
-    console.log(`Auto-PO and Items created successfully via Deep Insert.`);
-};
+        console.log(`Auto-PO and Items created successfully via Deep Insert.`);
+    };
 
-    
-// async function createPO(inventoryItemId) {
-//     await INSERT.into(PO).entries({
-//         supplier_ID: "ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec", // Use your supplier UUID here
-//         poItems: [
-//             {
-//                 poItem_ID: inventoryItemId,
-//                 quantity: 5
-//                 // itemsYetToReceive: 5 // Initializing this since it's not virtual
-//             }
-//         ]
-//     });
-// }
+
+    // async function createPO(inventoryItemId) {
+    //     await INSERT.into(PO).entries({
+    //         supplier_ID: "ca6e8076-5e0f-4e59-a7d3-d8fa84e412ec", // Use your supplier UUID here
+    //         poItems: [
+    //             {
+    //                 poItem_ID: inventoryItemId,
+    //                 quantity: 5
+    //                 // itemsYetToReceive: 5 // Initializing this since it's not virtual
+    //             }
+    //         ]
+    //     });
+    // }
 
 
     this.on('addnewCustomer', async (req) => {
@@ -265,11 +265,19 @@ module.exports = cds.service.impl(function () {
             return req.error(404, "Status Not found")
         }
 
+        const lastEntry = await SELECT.one.from(RetailLedger)
+            .columns('currentBalance', 'sequenceNum')
+            .orderBy('sequenceNum desc');
+
+        let runningBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        let nextSeq = lastEntry ? (Number(lastEntry.sequenceNum) + 1) : 1;
         for (const item of saleRecord.items) {
             if (item.itemStatus_ID === saleItemStatus.ID) {
                 return req.error(400, `Some Items in the purchase are already paid.Please Check again.`)
             }
-            await updateLedger(item, req, "SALES", "CREDIT");
+            const result = await updateLedger(item, req, "SALES", "CREDIT", runningBalance, nextSeq);
+            runningBalance = result.newBalance;
+            nextSeq = result.nextSeq;
             await updateInventory(item, req, "Purchase");
         }
         req.info("Ledger Updated")
@@ -285,32 +293,46 @@ module.exports = cds.service.impl(function () {
     })
 
 
-    async function updateLedger(item, req, department, transactionType) {
+    async function updateLedger(item, req, department, transactionType, previousBalance, currentSeq) {
         const deptRecord = await SELECT.one.from(Departments).where({ dept: department });
         if (!deptRecord) return req.error(400, 'Invalid Department');
 
         const debitRecord = await SELECT.one.from(PassbookEntryTypes).where({ entryType: transactionType })
         if (!debitRecord) return req.error(400, `${transactionType} not found`)
 
-        const lastEntry = await SELECT.one.from(RetailLedger)
-            .columns('currentBalance')
-            .orderBy('createdAt desc');
+        // const lastEntry = await SELECT.one.from(RetailLedger)
+        //     .columns('currentBalance')
+        //     .orderBy('createdAt desc');
 
-        const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        // const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+
+
+        let transactionAmount = Number(item.totalPayableAmount)
         let newBalance;
-        if (transactionType === "CREDIT")
-            newBalance = previousBalance + Number(item.totalPayableAmount);
-        else if (transactionType === "DEBIT")
-            newBalance = previousBalance - Number(item.totalPayableAmount);
+        if (transactionType === "CREDIT") {
+            // newBalance = previousBalance + Number(item.totalPayableAmount);
+            newBalance = Number((previousBalance + transactionAmount).toFixed(2));
+        }
+        else if (transactionType === "DEBIT") {
+            // newBalance = previousBalance - Number(item.totalPayableAmount);
+            newBalance = Number((previousBalance - transactionAmount).toFixed(2));
+
+        }
 
 
 
         await INSERT.into(RetailLedger).entries({
+            sequenceNum: currentSeq,
             entryType_ID: debitRecord.ID,
             department_ID: deptRecord.ID,
-            amount: Number(item.totalPayableAmount),
+            amount: transactionAmount,
             currentBalance: Number(newBalance.toFixed(2))
         })
+
+        return {
+            newBalance: newBalance,
+            nextSeq: currentSeq + 1 // Pass the next number back to the loop
+        };
     }
 
 
@@ -366,6 +388,15 @@ module.exports = cds.service.impl(function () {
             return req.error(404, "Status Not found")
         }
         let returnItemArray = [];
+
+        const lastEntry = await SELECT.one.from(RetailLedger)
+            .columns('currentBalance', 'sequenceNum')
+            .orderBy('sequenceNum desc');
+
+        let runningBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        let nextSeq = lastEntry ? (Number(lastEntry.sequenceNum) + 1) : 1;
+
+
         for (const item of salesRecord.items) {
             if (item.itemStatus_ID === saleItemStatus.ID) {
                 //this item was already returned
@@ -377,7 +408,9 @@ module.exports = cds.service.impl(function () {
             })
             //update inventory
             updateInventory(item, req, "Full Return");
-            updateLedger(item, req, "SALES", "DEBIT")
+            const result = updateLedger(item, req, "SALES", "DEBIT", runningBalance, nextSeq)
+            runningBalance = result.newBalance;
+            nextSeq = result.nextSeq;
 
         }
 
@@ -393,33 +426,44 @@ module.exports = cds.service.impl(function () {
 
     })
 
-    async function updateLedgerForPartialItemReturn(item, req, department, transactionType) {
+    async function updateLedgerForPartialItemReturn(item, req, department, transactionType,previousBalance,currentSeq) {
         const deptRecord = await SELECT.one.from(Departments).where({ dept: department });
         if (!deptRecord) return req.error(400, 'Invalid Department');
 
         const debitRecord = await SELECT.one.from(PassbookEntryTypes).where({ entryType: transactionType })
         if (!debitRecord) return req.error(400, `${transactionType} not found`)
 
-        const lastEntry = await SELECT.one.from(RetailLedger)
-            .columns('currentBalance')
-            .orderBy('createdAt desc');
+        // const lastEntry = await SELECT.one.from(RetailLedger)
+        //     .columns('currentBalance')
+        //     .orderBy('createdAt desc');
 
-        const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        // const previousBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
         let newBalance, amountToLog;
+
+
+        // let transactionAmount = Number((itemcostprice * (gritem.quantityReceived - gritem.quantityDamaged)).toFixed(2));
+        
         if (transactionType === "CREDIT") {
             amountToLog = item.totalPayableAmount
-            newBalance = previousBalance + amountToLog;
+            // newBalance = previousBalance + amountToLog;
+             newBalance = Number((previousBalance + amountToLog).toFixed(2));
         }
         else if (transactionType === "DEBIT") {
             amountToLog = (item.totalPayableAmount / item.quantity) * req.data.quantity
-            newBalance = previousBalance - amountToLog;
+            // newBalance = previousBalance - amountToLog;
+            newBalance = Number((previousBalance - amountToLog).toFixed(2));
         }
         await INSERT.into(RetailLedger).entries({
+            sequenceNum: currentSeq,
             entryType_ID: debitRecord.ID,
             department_ID: deptRecord.ID,
             amount: amountToLog,
             currentBalance: newBalance
         })
+         return {
+        newBalance: newBalance,
+        nextSeq: currentSeq + 1 // Pass the next number back to the loop
+    };
     }
 
     this.on('returnItems', async (req) => {
@@ -454,14 +498,27 @@ module.exports = cds.service.impl(function () {
         await UPDATE(SalesItems).set({ returnedQuantity: { '+=': quantity } }).where({ ID: ID })
 
         let status;
+
+        const lastEntry = await SELECT.one.from(RetailLedger)
+            .columns('currentBalance', 'sequenceNum')
+            .orderBy('sequenceNum desc');
+
+        let runningBalance = lastEntry ? Number(lastEntry.currentBalance) : 0;
+        let nextSeq = lastEntry ? (Number(lastEntry.sequenceNum) + 1) : 1;
+
         if (quantity == (salesitem.quantity - salesitem.returnedQuantity)) {
             status = 'Full Return'
             await updateInventory(salesitem, req, status)
-            await updateLedger(salesitem, req, "SALES", "DEBIT")
-        } else if (quantity < (salesitem.quantity - salesitem.returnedQuantity)) {
+            const result = await updateLedger(salesitem, req, "SALES", "DEBIT",runningBalance,nextSeq);
+            runningBalance = result.newBalance;
+        nextSeq = result.nextSeq;
+        } 
+        else if (quantity < (salesitem.quantity - salesitem.returnedQuantity)) {
             status = 'Partial Return'
             await updateInventory(salesitem, req, status)
-            await updateLedgerForPartialItemReturn(salesitem, req, "SALES", "DEBIT")
+            const result = await updateLedgerForPartialItemReturn(salesitem, req, "SALES", "DEBIT",runningBalance,nextSeq);
+            runningBalance = result.newBalance;
+        nextSeq = result.nextSeq;
         }
 
 
