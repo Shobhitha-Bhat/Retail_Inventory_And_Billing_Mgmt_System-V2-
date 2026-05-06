@@ -643,7 +643,7 @@ module.exports = cds.service.impl(function () {
         const remainingItems = await SELECT.from(SalesItems).where({ parentSales_ID: parentsale.ID });
     const newBillTotal = remainingItems.reduce((acc, item) => acc + Number(item.totalPayableAmount), 0);
 
-    await UPDATE(Sales).set({ billTotal: newBillTotal }).where({ ID: parentSales_ID });
+    await UPDATE(Sales).set({ billTotal: newBillTotal }).where({ ID: parentsale.ID });
 
     req.info("Item removed and totals recalculated.");
         await SELECT.one.from(SalesItems).where({ ID: ID })
