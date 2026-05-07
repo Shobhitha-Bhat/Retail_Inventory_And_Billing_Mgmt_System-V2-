@@ -375,7 +375,7 @@ module.exports = cds.service.impl(function () {
         if (salesRecord.paymentStatus_ID !== purchasePayStatus.ID) {
             return req.error(404, "Purchase Not Paid")
         }
-        const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: 'CompleteReturn' })
+        const salesReturnRecord = await SELECT.one.from(SalesReturnStatus).where({ retStatus: 'Complete Return' })
         if (!salesReturnRecord) {
             return req.error(404, "Return record not found")
         }
