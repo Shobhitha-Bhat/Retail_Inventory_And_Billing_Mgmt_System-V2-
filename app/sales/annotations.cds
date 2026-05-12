@@ -59,11 +59,6 @@ annotate service.Sales with @(
     UI.LineItem : [
         {
             $Type : 'UI.DataFieldForAction',
-            Action : 'SalesService.generateInvoice',
-            Label : 'generateInvoice',
-        },
-        {
-            $Type : 'UI.DataFieldForAction',
             Action : 'SalesService.payForPurchase',
             Label : 'payForPurchase',
         },

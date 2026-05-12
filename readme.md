@@ -29,3 +29,5 @@ Fiori Applications:
 - distributor-portal
 - manage-inventory
 - manage-finance(ledger)
+
+```git reset --hard <commit-hash> && git clean -fd```
