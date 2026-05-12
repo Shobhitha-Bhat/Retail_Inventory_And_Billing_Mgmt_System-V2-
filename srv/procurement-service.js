@@ -405,7 +405,8 @@ module.exports = function () {
 
             // await UPDATE(GR).set({ status_ID: grStatusRecord.ID, paymentStatus_ID: grPaymentStatus.ID }).where({ ID: ID })
             // await UPDATE(PO).set({ status_ID: poStatusRecord.ID }).where({ ID: selectedGR.originalPO_ID })
-            await UPDATE(POItems).set({ itemsYetToReceive: { '-=': gritem.quantityReceived - gritem.quantityDamaged } }).where({ ID: gritem.poItem_ID })
+            // await UPDATE(POItems).set({ itemsYetToReceive: { '-=': gritem.quantityReceived - gritem.quantityDamaged } }).where({ ID: gritem.poItem_ID })
+            await UPDATE(POItems).set({ itemsYetToReceive:  gritem.quantityReceived - gritem.quantityDamaged  }).where({ ID: gritem.poItem_ID })
             await addToInventory(gritem, req);
             const result = await updateLedger(gritem, req, runningBalance,nextSeq);
             runningBalance = result.newBalance;
